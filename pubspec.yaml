@@ -74,6 +74,29 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
+  fonts:
+    - family: SFD-Bold
+      fonts:
+        - asset: assets/SFProDisplay-Bold.ttf
+    - family: SFD-Regular
+      fonts:
+        - asset: assets/SFProDisplay-Regular.ttf
+
+    - family: SFT-Regular
+      fonts:
+        - asset: assets/SFProText-Regular.ttf
+
+    - family: SFNSR
+      fonts:
+        - asset: assets/SFNSRounded.ttf
+
+    - family: AR
+      fonts:
+        - asset: assets/ArialRounded.ttf
+
+    - family: SFT-Bold
+      fonts:
+        - asset: assets/SFProText-Bold.ttf
   # fonts:
   #   - family: Schyler
   #     fonts:
