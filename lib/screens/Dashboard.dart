@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:intl/intl.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -10,6 +12,20 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  final TextEditingController _amountController = TextEditingController();
+  static const _locale = 'en';
+  String _formatNumber(String s) =>
+      NumberFormat.decimalPattern(_locale).format(int.parse(s));
+
+  final NumberFormat currencyFormat =
+      NumberFormat.currency(locale: 'en_US', symbol: '\$');
+
+  final minimumBalanceOne = 0;
+  final sendingFeeOne = 0;
+  final withdrawalChargeOne = 0;
+
+  calculateFees() {}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,23 +42,37 @@ class _DashboardState extends State<Dashboard> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: const [
-                  SizedBox(height: 40.0),
-                  Text(
+                children: [
+                  const SizedBox(height: 40.0),
+                  const Text(
                     "Amount you wish to spend",
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: 'SFNSR',
                     ),
                   ),
-                  SizedBox(height: 15.0),
-                  Text(
-                    "34,754",
-                    style: TextStyle(
+                  const SizedBox(height: 5.0),
+                  CupertinoTextField(
+                    cursorColor: Colors.white,
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 40.0,
                       fontFamily: 'SFT-Bold',
+                      fontSize: 32.0,
                     ),
+                    controller: _amountController,
+                    decoration: const BoxDecoration(
+                      color: Colors.transparent,
+                    ),
+                    onChanged: (string) {
+                      string = _formatNumber(string.replaceAll(',', ''));
+                      _amountController.value = TextEditingValue(
+                        text: string,
+                        selection:
+                            TextSelection.collapsed(offset: string.length),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -52,12 +82,12 @@ class _DashboardState extends State<Dashboard> {
               child: Column(
                 children: [
                   TitleTab(title: "Sending to a registered number"),
-                  SizedBox(height: 15.0),
+                  const SizedBox(height: 15.0),
                   Container(
                     width: double.infinity,
-                    padding: EdgeInsets.symmetric(vertical: 10.0),
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
                     decoration: BoxDecoration(
-                      color: Color(0xff52B44B).withOpacity(0.1),
+                      color: const Color(0xff52B44B).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                     child: Column(
@@ -76,14 +106,14 @@ class _DashboardState extends State<Dashboard> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 30.0),
+                  const SizedBox(height: 30.0),
                   TitleTab(title: "Sending to an unregistered number"),
-                  SizedBox(height: 15.0),
+                  const SizedBox(height: 15.0),
                   Container(
                     width: double.infinity,
-                    padding: EdgeInsets.symmetric(vertical: 10.0),
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
                     decoration: BoxDecoration(
-                      color: Color(0xff52B44B).withOpacity(0.1),
+                      color: const Color(0xff52B44B).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                     child: Column(
@@ -97,14 +127,14 @@ class _DashboardState extends State<Dashboard> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 30.0),
+                  const SizedBox(height: 30.0),
                   TitleTab(title: "Withdraw at an agent"),
-                  SizedBox(height: 15.0),
+                  const SizedBox(height: 15.0),
                   Container(
                     width: double.infinity,
-                    padding: EdgeInsets.symmetric(vertical: 10.0),
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
                     decoration: BoxDecoration(
-                      color: Color(0xff52B44B).withOpacity(0.1),
+                      color: const Color(0xff52B44B).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                     child: Column(
@@ -118,14 +148,14 @@ class _DashboardState extends State<Dashboard> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 30.0),
+                  const SizedBox(height: 30.0),
                   TitleTab(title: "Withdraw at an ATM"),
-                  SizedBox(height: 15.0),
+                  const SizedBox(height: 15.0),
                   Container(
                     width: double.infinity,
-                    padding: EdgeInsets.symmetric(vertical: 10.0),
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
                     decoration: BoxDecoration(
-                      color: Color(0xff52B44B).withOpacity(0.1),
+                      color: const Color(0xff52B44B).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                     child: Column(
@@ -152,7 +182,7 @@ class _DashboardState extends State<Dashboard> {
 class TitleTab extends StatelessWidget {
   final String title;
 
-  TitleTab({
+  const TitleTab({
     required this.title,
   });
 
@@ -172,7 +202,7 @@ class TitleTab extends StatelessWidget {
       ),
       child: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           fontFamily: "AR",
           fontSize: 14.0,
           color: Colors.white,
@@ -194,7 +224,7 @@ class AmountTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(
+      padding: const EdgeInsets.only(
         left: 15.0,
         right: 15.0,
         top: 8.0,
@@ -207,14 +237,14 @@ class AmountTag extends StatelessWidget {
           Text(
             title,
             textAlign: TextAlign.start,
-            style: TextStyle(
+            style: const TextStyle(
                 color: Color(0xff52B44B), fontSize: 14.0, fontFamily: "SFNSR"),
           ),
-          SizedBox(height: 5.0),
+          const SizedBox(height: 5.0),
           Text(
             amount,
             textAlign: TextAlign.start,
-            style: TextStyle(
+            style: const TextStyle(
               fontFamily: "SFT-Bold",
               fontSize: 24.0,
               color: Color(0xff52B44B),
