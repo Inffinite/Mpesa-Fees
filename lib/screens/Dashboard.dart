@@ -1,8 +1,12 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:intl/intl.dart';
+
+import '../data/data.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -20,11 +24,69 @@ class _DashboardState extends State<Dashboard> {
   final NumberFormat currencyFormat =
       NumberFormat.currency(locale: 'en_US', symbol: '\$');
 
-  final minimumBalanceOne = 0;
-  final sendingFeeOne = 0;
-  final withdrawalChargeOne = 0;
+  var minimumBalanceOne = 0;
+  var sendingFeeOne = 0;
+  var amountToSendOne = 0;
 
-  calculateFees() {}
+  var agentWithdrawalFee = 0;
+  var atmWithdrawalFee = 0;
+
+  calculateFees() async {
+    log(_amountController.text);
+    for (var i = 0; i < registeredUsers.length; i++) {
+      // Calculate sending fees - one
+      if (int.parse(_amountController.text.replaceAll(',', '')) >=
+              registeredUsers[i][0] &&
+          int.parse(_amountController.text.replaceAll(',', '')) <=
+              registeredUsers[i][1]) {
+        setState(() {
+          sendingFeeOne = registeredUsers[i][2];
+        });
+        await calculateWithdrawalCharges();
+        return;
+      }
+
+      // Calculate sending fees - one
+      if (int.parse(_amountController.text.replaceAll(',', '')) >=
+              registeredUsers[i][0] &&
+          int.parse(_amountController.text.replaceAll(',', '')) <=
+              registeredUsers[i][1]) {
+        setState(() {
+          sendingFeeOne = registeredUsers[i][2];
+        });
+
+        await calculateWithdrawalCharges();
+        return;
+      }
+    }
+  }
+
+  calculateWithdrawalCharges() async {
+    for (var i = 0; i < agentWithdrawal.length; i++) {
+      if (int.parse(_amountController.text.replaceAll(',', '')) >=
+              agentWithdrawal[i][0] &&
+          int.parse(_amountController.text.replaceAll(',', '')) <=
+              agentWithdrawal[i][1]) {
+        setState(() {
+          agentWithdrawalFee = agentWithdrawal[i][2];
+        });
+        await calculateBalances();
+        return;
+      }
+    }
+  }
+
+  calculateBalances() {
+    // Calculate amount to send - one
+    setState(() {
+      amountToSendOne = agentWithdrawalFee +
+          int.parse(_amountController.text.replaceAll(',', ''));
+      minimumBalanceOne =
+          int.parse(_amountController.text.replaceAll(',', '')) +
+              sendingFeeOne +
+              agentWithdrawalFee;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +105,7 @@ class _DashboardState extends State<Dashboard> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 40.0),
+                  const SizedBox(height: 50.0),
                   const Text(
                     "Amount you wish to spend",
                     style: TextStyle(
@@ -51,11 +113,15 @@ class _DashboardState extends State<Dashboard> {
                       fontFamily: 'SFNSR',
                     ),
                   ),
-                  const SizedBox(height: 5.0),
+                  const SizedBox(height: 8.0),
                   CupertinoTextField(
                     cursorColor: Colors.white,
                     keyboardType: TextInputType.number,
                     textAlign: TextAlign.center,
+                    placeholder: "0.0",
+                    placeholderStyle: TextStyle(
+                      color: Colors.white.withOpacity(0.3),
+                    ),
                     style: const TextStyle(
                       color: Colors.white,
                       fontFamily: 'SFT-Bold',
@@ -66,12 +132,15 @@ class _DashboardState extends State<Dashboard> {
                       color: Colors.transparent,
                     ),
                     onChanged: (string) {
-                      string = _formatNumber(string.replaceAll(',', ''));
-                      _amountController.value = TextEditingValue(
-                        text: string,
-                        selection:
-                            TextSelection.collapsed(offset: string.length),
-                      );
+                      if (!string.isEmpty) {
+                        string = _formatNumber(string.replaceAll(',', ''));
+                        _amountController.value = TextEditingValue(
+                          text: string,
+                          selection:
+                              TextSelection.collapsed(offset: string.length),
+                        );
+                        calculateFees();
+                      }
                     },
                   ),
                 ],
@@ -92,17 +161,37 @@ class _DashboardState extends State<Dashboard> {
                     ),
                     child: Column(
                       children: [
-                        AmountTag(title: "Minimum balance", amount: '45,555'),
+                        AmountTag(
+                            title: "Amount to send",
+                            amount: _formatNumber(amountToSendOne
+                                .toString()
+                                .replaceAll(',', ''))),
                         Divider(
                           color: const Color(0xff52B44B).withOpacity(0.1),
                           thickness: 2.0,
                         ),
-                        AmountTag(title: "Sending fee", amount: '105'),
+                        AmountTag(
+                            title: "Minimum balance",
+                            amount: _formatNumber(minimumBalanceOne
+                                .toString()
+                                .replaceAll(',', ''))),
                         Divider(
                           color: const Color(0xff52B44B).withOpacity(0.1),
                           thickness: 2.0,
                         ),
-                        AmountTag(title: "Withdrawal charge", amount: '191'),
+                        AmountTag(
+                            title: "Sending fee",
+                            amount: _formatNumber(
+                                sendingFeeOne.toString().replaceAll(',', ''))),
+                        Divider(
+                          color: const Color(0xff52B44B).withOpacity(0.1),
+                          thickness: 2.0,
+                        ),
+                        AmountTag(
+                            title: "Withdrawal charge",
+                            amount: _formatNumber(agentWithdrawalFee
+                                .toString()
+                                .replaceAll(',', ''))),
                       ],
                     ),
                   ),
