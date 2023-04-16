@@ -25,14 +25,40 @@ class _DashboardState extends State<Dashboard> {
       NumberFormat.currency(locale: 'en_US', symbol: '\$');
 
   var minimumBalanceOne = 0;
+
   var sendingFeeOne = 0;
+  var sendingFeeTwo = 0;
+
   var amountToSendOne = 0;
+  var amountToSendTwo = 0;
 
   var agentWithdrawalFee = 0;
   var atmWithdrawalFee = 0;
+  var withdrawableAmountAgent = 0;
+  var withdrawableAmountAtm = 0;
+
+  var notSupported = false;
+  var atmNotSupported = false;
+
+  calculateUnregisteredFees() {
+    for (var i = 0; i < unregisteredUsers.length; i++) {
+      // Calculate sending fees for unregistered numbers - two
+      if (int.parse(_amountController.text.replaceAll(',', '')) >=
+              unregisteredUsers[i][0] &&
+          int.parse(_amountController.text.replaceAll(',', '')) <=
+              unregisteredUsers[i][1]) {
+        setState(() {
+          sendingFeeTwo = unregisteredUsers[i][2];
+          amountToSendTwo =
+              int.parse(_amountController.text.replaceAll(',', '')) +
+                  sendingFeeTwo;
+        });
+        return;
+      }
+    }
+  }
 
   calculateFees() async {
-    log(_amountController.text);
     for (var i = 0; i < registeredUsers.length; i++) {
       // Calculate sending fees - one
       if (int.parse(_amountController.text.replaceAll(',', '')) >=
@@ -42,7 +68,8 @@ class _DashboardState extends State<Dashboard> {
         setState(() {
           sendingFeeOne = registeredUsers[i][2];
         });
-        await calculateWithdrawalCharges();
+        await calculateAgentWithdrawalCharges();
+        await calculateAtmWithdrawalCharges();
         return;
       }
 
@@ -55,13 +82,14 @@ class _DashboardState extends State<Dashboard> {
           sendingFeeOne = registeredUsers[i][2];
         });
 
-        await calculateWithdrawalCharges();
+        await calculateAgentWithdrawalCharges();
+        await calculateAtmWithdrawalCharges();
         return;
       }
     }
   }
 
-  calculateWithdrawalCharges() async {
+  calculateAgentWithdrawalCharges() async {
     for (var i = 0; i < agentWithdrawal.length; i++) {
       if (int.parse(_amountController.text.replaceAll(',', '')) >=
               agentWithdrawal[i][0] &&
@@ -69,6 +97,29 @@ class _DashboardState extends State<Dashboard> {
               agentWithdrawal[i][1]) {
         setState(() {
           agentWithdrawalFee = agentWithdrawal[i][2];
+
+          withdrawableAmountAgent =
+              int.parse(_amountController.text.replaceAll(',', '')) -
+                  agentWithdrawalFee;
+        });
+        await calculateBalances();
+        return;
+      }
+    }
+  }
+
+  calculateAtmWithdrawalCharges() async {
+    for (var i = 0; i < atmWithdrawal.length; i++) {
+      if (int.parse(_amountController.text.replaceAll(',', '')) >=
+              atmWithdrawal[i][0] &&
+          int.parse(_amountController.text.replaceAll(',', '')) <=
+              atmWithdrawal[i][1]) {
+        setState(() {
+          atmWithdrawalFee = atmWithdrawal[i][2];
+
+          withdrawableAmountAtm =
+              int.parse(_amountController.text.replaceAll(',', '')) -
+                  atmWithdrawalFee;
         });
         await calculateBalances();
         return;
@@ -139,7 +190,30 @@ class _DashboardState extends State<Dashboard> {
                           selection:
                               TextSelection.collapsed(offset: string.length),
                         );
-                        calculateFees();
+
+                        if (int.parse(
+                                _amountController.text.replaceAll(',', '')) >
+                            20000) {
+                          setState(() {
+                            atmNotSupported = true;
+                          });
+                        } else {
+                          setState(() {
+                            atmNotSupported = false;
+                          });
+                        }
+
+                        if (int.parse(
+                                _amountController.text.replaceAll(',', '')) >
+                            150000) {
+                          setState(() {
+                            notSupported = true;
+                          });
+                        } else {
+                          notSupported = false;
+                          calculateFees();
+                          calculateUnregisteredFees();
+                        }
                       }
                     },
                   ),
@@ -163,40 +237,56 @@ class _DashboardState extends State<Dashboard> {
                       children: [
                         AmountTag(
                             title: "Amount to send",
-                            amount: _formatNumber(amountToSendOne
-                                .toString()
-                                .replaceAll(',', ''))),
+                            amount: notSupported == true
+                                ? "N/A"
+                                : _formatNumber(amountToSendOne
+                                    .toString()
+                                    .replaceAll(',', ''))),
                         Divider(
                           color: const Color(0xff52B44B).withOpacity(0.1),
                           thickness: 2.0,
                         ),
                         AmountTag(
-                            title: "Minimum balance",
-                            amount: _formatNumber(minimumBalanceOne
-                                .toString()
-                                .replaceAll(',', ''))),
+                          title: "Account minimum balance",
+                          amount: notSupported == true
+                              ? "N/A"
+                              : _formatNumber(
+                                  minimumBalanceOne
+                                      .toString()
+                                      .replaceAll(',', ''),
+                                ),
+                        ),
                         Divider(
                           color: const Color(0xff52B44B).withOpacity(0.1),
                           thickness: 2.0,
                         ),
                         AmountTag(
-                            title: "Sending fee",
-                            amount: _formatNumber(
-                                sendingFeeOne.toString().replaceAll(',', ''))),
+                          title: "Sending fee",
+                          amount: notSupported == true
+                              ? "N/A"
+                              : _formatNumber(
+                                  sendingFeeOne.toString().replaceAll(',', ''),
+                                ),
+                        ),
                         Divider(
                           color: const Color(0xff52B44B).withOpacity(0.1),
                           thickness: 2.0,
                         ),
                         AmountTag(
-                            title: "Withdrawal charge",
-                            amount: _formatNumber(agentWithdrawalFee
-                                .toString()
-                                .replaceAll(',', ''))),
+                          title: "Withdrawal charge",
+                          amount: notSupported == true
+                              ? "N/A"
+                              : _formatNumber(
+                                  agentWithdrawalFee
+                                      .toString()
+                                      .replaceAll(',', ''),
+                                ),
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 30.0),
-                  TitleTab(title: "Sending to an unregistered number"),
+                  const TitleTab(title: "Sending to an unregistered number"),
                   const SizedBox(height: 15.0),
                   Container(
                     width: double.infinity,
@@ -207,12 +297,28 @@ class _DashboardState extends State<Dashboard> {
                     ),
                     child: Column(
                       children: [
-                        AmountTag(title: "Minimum balance", amount: '45,555'),
+                        AmountTag(
+                          title: "Account minimum balance",
+                          amount: notSupported == true
+                              ? "N/A"
+                              : _formatNumber(
+                                  amountToSendTwo
+                                      .toString()
+                                      .replaceAll(',', ''),
+                                ),
+                        ),
                         Divider(
                           color: const Color(0xff52B44B).withOpacity(0.1),
                           thickness: 2.0,
                         ),
-                        AmountTag(title: "Sending fee", amount: '105'),
+                        AmountTag(
+                          title: "Sending fee",
+                          amount: notSupported == true
+                              ? "N/A"
+                              : _formatNumber(
+                                  sendingFeeTwo.toString().replaceAll(',', ''),
+                                ),
+                        ),
                       ],
                     ),
                   ),
@@ -228,12 +334,30 @@ class _DashboardState extends State<Dashboard> {
                     ),
                     child: Column(
                       children: [
-                        AmountTag(title: "Withdrawal charge", amount: '45,555'),
+                        AmountTag(
+                          title: "Withdrawal charge",
+                          amount: notSupported == true
+                              ? "N/A"
+                              : _formatNumber(
+                                  agentWithdrawalFee
+                                      .toString()
+                                      .replaceAll(',', ''),
+                                ),
+                        ),
                         Divider(
                           color: const Color(0xff52B44B).withOpacity(0.1),
                           thickness: 2.0,
                         ),
-                        AmountTag(title: "Withdrawable amount", amount: '105'),
+                        AmountTag(
+                          title: "Withdrawable amount",
+                          amount: notSupported == true
+                              ? "N/A"
+                              : _formatNumber(
+                                  withdrawableAmountAgent
+                                      .toString()
+                                      .replaceAll(',', ''),
+                                ),
+                        ),
                       ],
                     ),
                   ),
@@ -249,12 +373,32 @@ class _DashboardState extends State<Dashboard> {
                     ),
                     child: Column(
                       children: [
-                        AmountTag(title: "Withdrawal charge", amount: '45,555'),
+                        AmountTag(
+                          title: "Withdrawal charge",
+                          amount:
+                              notSupported == true || atmNotSupported == true
+                                  ? "N/A"
+                                  : _formatNumber(
+                                      atmWithdrawalFee
+                                          .toString()
+                                          .replaceAll(',', ''),
+                                    ),
+                        ),
                         Divider(
                           color: const Color(0xff52B44B).withOpacity(0.1),
                           thickness: 2.0,
                         ),
-                        AmountTag(title: "Withdrawable amount", amount: '105'),
+                        AmountTag(
+                          title: "Withdrawable amount",
+                          amount:
+                              notSupported == true || atmNotSupported == true
+                                  ? "N/A"
+                                  : _formatNumber(
+                                      withdrawableAmountAtm
+                                          .toString()
+                                          .replaceAll(',', ''),
+                                    ),
+                        ),
                       ],
                     ),
                   ),
