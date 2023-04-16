@@ -18,12 +18,15 @@ class AmountTag extends StatelessWidget {
   void showToast(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Text(
+          message,
+          style: TextStyle(fontFamily: "SFNSR"),
+        ),
         duration: Duration(seconds: 2),
         backgroundColor: Color(0xff52B44B),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(4),
         ),
       ),
     );
