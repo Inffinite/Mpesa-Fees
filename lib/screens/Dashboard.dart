@@ -2,11 +2,11 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:intl/intl.dart';
 
 import '../data/data.dart';
+import '../widgets/AmountTag.dart';
+import '../widgets/TitleTab.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -183,7 +183,7 @@ class _DashboardState extends State<Dashboard> {
                       color: Colors.transparent,
                     ),
                     onChanged: (string) {
-                      if (!string.isEmpty) {
+                      if (string.isNotEmpty) {
                         string = _formatNumber(string.replaceAll(',', ''));
                         _amountController.value = TextEditingValue(
                           text: string,
@@ -224,7 +224,7 @@ class _DashboardState extends State<Dashboard> {
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 children: [
-                  TitleTab(title: "Sending to a registered number"),
+                  const TitleTab(title: "Sending to a registered number"),
                   const SizedBox(height: 15.0),
                   Container(
                     width: double.infinity,
@@ -323,7 +323,7 @@ class _DashboardState extends State<Dashboard> {
                     ),
                   ),
                   const SizedBox(height: 30.0),
-                  TitleTab(title: "Withdraw at an agent"),
+                  const TitleTab(title: "Withdraw at an agent"),
                   const SizedBox(height: 15.0),
                   Container(
                     width: double.infinity,
@@ -362,7 +362,7 @@ class _DashboardState extends State<Dashboard> {
                     ),
                   ),
                   const SizedBox(height: 30.0),
-                  TitleTab(title: "Withdraw at an ATM"),
+                  const TitleTab(title: "Withdraw at an ATM"),
                   const SizedBox(height: 15.0),
                   Container(
                     width: double.infinity,
@@ -407,83 +407,6 @@ class _DashboardState extends State<Dashboard> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class TitleTab extends StatelessWidget {
-  final String title;
-
-  const TitleTab({
-    required this.title,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.only(
-        top: 10.0,
-        bottom: 10.0,
-        left: 20.0,
-        right: 20.0,
-      ),
-      decoration: BoxDecoration(
-        color: const Color(0xff52B44B),
-        borderRadius: BorderRadius.circular(5.0),
-      ),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontFamily: "AR",
-          fontSize: 14.0,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-}
-
-class AmountTag extends StatelessWidget {
-  final String title;
-  final String amount;
-
-  AmountTag({
-    required this.title,
-    required this.amount,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(
-        left: 15.0,
-        right: 15.0,
-        top: 8.0,
-        bottom: 8.0,
-      ),
-      width: double.infinity,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            textAlign: TextAlign.start,
-            style: const TextStyle(
-                color: Color(0xff52B44B), fontSize: 14.0, fontFamily: "SFNSR"),
-          ),
-          const SizedBox(height: 5.0),
-          Text(
-            amount,
-            textAlign: TextAlign.start,
-            style: const TextStyle(
-              fontFamily: "SFT-Bold",
-              fontSize: 24.0,
-              color: Color(0xff52B44B),
-            ),
-          ),
-        ],
       ),
     );
   }
