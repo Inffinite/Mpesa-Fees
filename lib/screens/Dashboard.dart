@@ -72,20 +72,6 @@ class _DashboardState extends State<Dashboard> {
         await calculateAtmWithdrawalCharges();
         return;
       }
-
-      // Calculate sending fees - one
-      if (int.parse(_amountController.text.replaceAll(',', '')) >=
-              registeredUsers[i][0] &&
-          int.parse(_amountController.text.replaceAll(',', '')) <=
-              registeredUsers[i][1]) {
-        setState(() {
-          sendingFeeOne = registeredUsers[i][2];
-        });
-
-        await calculateAgentWithdrawalCharges();
-        await calculateAtmWithdrawalCharges();
-        return;
-      }
     }
   }
 
@@ -128,15 +114,22 @@ class _DashboardState extends State<Dashboard> {
   }
 
   calculateBalances() {
-    // Calculate amount to send - one
-    setState(() {
-      amountToSendOne = agentWithdrawalFee +
-          int.parse(_amountController.text.replaceAll(',', ''));
-      minimumBalanceOne =
-          int.parse(_amountController.text.replaceAll(',', '')) +
-              sendingFeeOne +
-              agentWithdrawalFee;
-    });
+    log("${int.parse(_amountController.text.replaceAll(',', ''))}");
+    if (_amountController.text.replaceAll(',', '').isEmpty) {
+      setState(() {
+        amountToSendOne = 0;
+        minimumBalanceOne = 0;
+      });
+    } else {
+      setState(() {
+        amountToSendOne = agentWithdrawalFee +
+            int.parse(_amountController.text.replaceAll(',', ''));
+        minimumBalanceOne =
+            int.parse(_amountController.text.replaceAll(',', '')) +
+                sendingFeeOne +
+                agentWithdrawalFee;
+      });
+    }
   }
 
   @override
@@ -158,7 +151,7 @@ class _DashboardState extends State<Dashboard> {
                 children: [
                   const SizedBox(height: 50.0),
                   const Text(
-                    "Amount you wish to spend",
+                    "Amount you wish to send",
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: 'SFNSR',
@@ -214,6 +207,18 @@ class _DashboardState extends State<Dashboard> {
                           calculateFees();
                           calculateUnregisteredFees();
                         }
+                      } else {
+                        setState(() {
+                          minimumBalanceOne = 0;
+                          sendingFeeOne = 0;
+                          sendingFeeTwo = 0;
+                          amountToSendOne = 0;
+                          amountToSendTwo = 0;
+                          agentWithdrawalFee = 0;
+                          atmWithdrawalFee = 0;
+                          withdrawableAmountAgent = 0;
+                          withdrawableAmountAtm = 0;
+                        });
                       }
                     },
                   ),
