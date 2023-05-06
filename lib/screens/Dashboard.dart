@@ -24,6 +24,8 @@ class _DashboardState extends State<Dashboard> {
   final NumberFormat currencyFormat =
       NumberFormat.currency(locale: 'en_US', symbol: '\$');
 
+  var statusMessage = "";
+
   var minimumBalanceOne = 0;
 
   var sendingFeeOne = 0;
@@ -114,7 +116,6 @@ class _DashboardState extends State<Dashboard> {
   }
 
   calculateBalances() {
-    log("${int.parse(_amountController.text.replaceAll(',', ''))}");
     if (_amountController.text.replaceAll(',', '').isEmpty) {
       setState(() {
         amountToSendOne = 0;
@@ -178,6 +179,10 @@ class _DashboardState extends State<Dashboard> {
                         color: Colors.transparent,
                       ),
                       onChanged: (string) {
+                        setState(() {
+                          statusMessage = "";
+                        });
+
                         if (string.isNotEmpty) {
                           string = _formatNumber(string.replaceAll(',', ''));
                           _amountController.value = TextEditingValue(
@@ -185,6 +190,20 @@ class _DashboardState extends State<Dashboard> {
                             selection:
                                 TextSelection.collapsed(offset: string.length),
                           );
+
+                          if (string.replaceAll(',', '') == "6969") {
+                            setState(() {
+                              statusMessage = "Nice!";
+                            });
+                          }
+
+                          if (string.replaceAll(',', '') == "999999") {
+                            setState(() {
+                              statusMessage = "You wish!";
+                            });
+                          }
+
+                          print(string);
 
                           if (int.parse(
                                   _amountController.text.replaceAll(',', '')) >
@@ -224,6 +243,29 @@ class _DashboardState extends State<Dashboard> {
                         }
                       },
                     ),
+                    SizedBox(height: 10.0),
+                    statusMessage.isEmpty
+                        ? Container()
+                        : Container(
+                            padding: EdgeInsets.only(
+                              top: 4.0,
+                              bottom: 4.0,
+                              left: 20.0,
+                              right: 20.0,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(50.0),
+                            ),
+                            child: Text(
+                              statusMessage,
+                              style: TextStyle(
+                                fontFamily: 'AR',
+                                color: Colors.white,
+                                fontSize: 12.0,
+                              ),
+                            ),
+                          ),
                   ],
                 ),
               ),
