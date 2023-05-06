@@ -1,7 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.mpesafees">
+    package="com.wrenix.mpesafees">
+    <uses-permission android:name="android.permission.INTERNET"/>
+    
    <application
-        android:label="mpesafees"
+        android:label="Mpesa Fees"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
