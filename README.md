@@ -10,3 +10,5 @@ With this app, you'll never have to wonder how much you're going to be charged a
 Plus, with the Mpesa Fee Calculator, you'll never have to worry about overpaying for your transactions. Unless, of course, you accidentally type in the wrong amount. But that's just user error, and we can't help you with that. Maybe you should consider investing in some finger exercises?
 
 So what are you waiting for? Download the Mpesa Fees Calculator today and never use your brain again! Because who needs intelligence when you have an app?
+
+[![Donate](https://raw.githubusercontent.com/steverichey/google-play-badge-svg/266d2b2df26f10d3c00b8129a0bd9f6da6b19f00/img/en_get.svg)](https://play.google.com/store/apps/details?id=com.wrenix.mpesafees&hl=en&gl=US)
