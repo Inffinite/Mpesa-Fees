@@ -1,4 +1,4 @@
-![](https://github.com/Inffinite/Mpesa-Fees/blob/main/assets/logo.png?raw=true)
+![](https://github.com/Inffinite/Mpesa-Fees/blob/main/App_Icon.png?raw=true)
 # Mpesa Fees
 
 Are you tired of actually using your brain to calculate Mpesa fees? Are you looking for a way to make your life even more dependent on technology? Well, do we have an app for you!
