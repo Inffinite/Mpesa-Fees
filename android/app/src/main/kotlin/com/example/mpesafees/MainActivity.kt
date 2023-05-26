@@ -1,4 +1,4 @@
-package com.example.mpesafees
+package com.wrenix.mpesafees
 
 import io.flutter.embedding.android.FlutterActivity
 
