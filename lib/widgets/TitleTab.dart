@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 
 class TitleTab extends StatelessWidget {
   final String title;
+  final String mptheme;
 
   const TitleTab({
     required this.title,
+    required this.mptheme,
   });
 
   @override
@@ -23,10 +25,10 @@ class TitleTab extends StatelessWidget {
       ),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: "AR",
           fontSize: 14.0,
-          color: Colors.white,
+          color: mptheme == "light" ? Colors.white : Color(0xff000000),
         ),
       ),
     );

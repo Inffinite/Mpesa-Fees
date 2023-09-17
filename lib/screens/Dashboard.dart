@@ -42,6 +42,13 @@ class _DashboardState extends State<Dashboard> {
   var notSupported = false;
   var atmNotSupported = false;
 
+  var mptheme = "light";
+
+  Color grn = Color(0xff52B44B);
+  Color white = Colors.white;
+
+  Color darkBlack = Color(0xff000000);
+
   calculateUnregisteredFees() {
     for (var i = 0; i < unregisteredUsers.length; i++) {
       // Calculate sending fees for unregistered numbers - two
@@ -138,39 +145,64 @@ class _DashboardState extends State<Dashboard> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: grn,
+          elevation: 5.0,
+          onPressed: () {
+            if (mptheme == "light") {
+              setState(() {
+                mptheme = "dark";
+              });
+            } else {
+              setState(() {
+                mptheme = "light";
+              });
+            }
+          },
+          child: Container(
+            child: Icon(
+              mptheme == "light"
+                  ? CupertinoIcons.moon_fill
+                  : CupertinoIcons.sun_max_fill,
+              color: mptheme == "light" ? white : darkBlack,
+            ),
+          ),
+        ),
+        backgroundColor: mptheme == "light" ? white : darkBlack,
         body: SingleChildScrollView(
           child: Column(
             children: [
               Container(
                 height: 200.0,
                 width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: Color(0xff52B44B),
+                decoration: BoxDecoration(
+                  color: grn,
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 50.0),
-                    const Text(
+                    Text(
                       "Amount you wish to send",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: mptheme == "light" ? white : darkBlack,
                         fontFamily: 'SFNSR',
                       ),
                     ),
                     const SizedBox(height: 8.0),
                     CupertinoTextField(
-                      cursorColor: Colors.white,
+                      cursorColor: mptheme == "light" ? white : darkBlack,
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
                       placeholder: "0.0",
                       placeholderStyle: TextStyle(
-                        color: Colors.white.withOpacity(0.3),
+                        color: mptheme == "light"
+                            ? white
+                            : darkBlack.withOpacity(0.3),
                       ),
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: mptheme == "light" ? white : darkBlack,
                         fontFamily: 'SFT-Bold',
                         fontSize: 32.0,
                       ),
@@ -254,14 +286,16 @@ class _DashboardState extends State<Dashboard> {
                               right: 20.0,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.3),
+                              color: mptheme == "light"
+                                  ? white
+                                  : darkBlack.withOpacity(0.3),
                               borderRadius: BorderRadius.circular(50.0),
                             ),
                             child: Text(
                               statusMessage,
                               style: TextStyle(
                                 fontFamily: 'AR',
-                                color: Colors.white,
+                                color: mptheme == "light" ? white : darkBlack,
                                 fontSize: 12.0,
                               ),
                             ),
@@ -273,13 +307,16 @@ class _DashboardState extends State<Dashboard> {
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
                   children: [
-                    const TitleTab(title: "Sending to a registered number"),
+                    TitleTab(
+                      title: "Sending to a registered number",
+                      mptheme: mptheme,
+                    ),
                     const SizedBox(height: 15.0),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 10.0),
                       decoration: BoxDecoration(
-                        color: const Color(0xff52B44B).withOpacity(0.1),
+                        color: grn.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       child: Column(
@@ -292,7 +329,7 @@ class _DashboardState extends State<Dashboard> {
                                       .toString()
                                       .replaceAll(',', ''))),
                           Divider(
-                            color: const Color(0xff52B44B).withOpacity(0.1),
+                            color: grn.withOpacity(0.1),
                             thickness: 2.0,
                           ),
                           AmountTag(
@@ -306,7 +343,7 @@ class _DashboardState extends State<Dashboard> {
                                   ),
                           ),
                           Divider(
-                            color: const Color(0xff52B44B).withOpacity(0.1),
+                            color: grn.withOpacity(0.1),
                             thickness: 2.0,
                           ),
                           AmountTag(
@@ -320,7 +357,7 @@ class _DashboardState extends State<Dashboard> {
                                   ),
                           ),
                           Divider(
-                            color: const Color(0xff52B44B).withOpacity(0.1),
+                            color: grn.withOpacity(0.1),
                             thickness: 2.0,
                           ),
                           AmountTag(
@@ -337,13 +374,16 @@ class _DashboardState extends State<Dashboard> {
                       ),
                     ),
                     const SizedBox(height: 30.0),
-                    const TitleTab(title: "Sending to an unregistered number"),
+                    TitleTab(
+                      title: "Sending to an unregistered number",
+                      mptheme: mptheme,
+                    ),
                     const SizedBox(height: 15.0),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 10.0),
                       decoration: BoxDecoration(
-                        color: const Color(0xff52B44B).withOpacity(0.1),
+                        color: grn.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       child: Column(
@@ -359,7 +399,7 @@ class _DashboardState extends State<Dashboard> {
                                   ),
                           ),
                           Divider(
-                            color: const Color(0xff52B44B).withOpacity(0.1),
+                            color: grn.withOpacity(0.1),
                             thickness: 2.0,
                           ),
                           AmountTag(
@@ -376,13 +416,16 @@ class _DashboardState extends State<Dashboard> {
                       ),
                     ),
                     const SizedBox(height: 30.0),
-                    const TitleTab(title: "Withdraw at an agent"),
+                    TitleTab(
+                      title: "Withdraw at an agent",
+                      mptheme: mptheme,
+                    ),
                     const SizedBox(height: 15.0),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 10.0),
                       decoration: BoxDecoration(
-                        color: const Color(0xff52B44B).withOpacity(0.1),
+                        color: grn.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       child: Column(
@@ -398,7 +441,7 @@ class _DashboardState extends State<Dashboard> {
                                   ),
                           ),
                           Divider(
-                            color: const Color(0xff52B44B).withOpacity(0.1),
+                            color: grn.withOpacity(0.1),
                             thickness: 2.0,
                           ),
                           AmountTag(
@@ -415,13 +458,16 @@ class _DashboardState extends State<Dashboard> {
                       ),
                     ),
                     const SizedBox(height: 30.0),
-                    const TitleTab(title: "Withdraw at an ATM"),
+                    TitleTab(
+                      title: "Withdraw at an ATM",
+                      mptheme: mptheme,
+                    ),
                     const SizedBox(height: 15.0),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 10.0),
                       decoration: BoxDecoration(
-                        color: const Color(0xff52B44B).withOpacity(0.1),
+                        color: grn.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       child: Column(
@@ -438,7 +484,7 @@ class _DashboardState extends State<Dashboard> {
                                       ),
                           ),
                           Divider(
-                            color: const Color(0xff52B44B).withOpacity(0.1),
+                            color: grn.withOpacity(0.1),
                             thickness: 2.0,
                           ),
                           AmountTag(
