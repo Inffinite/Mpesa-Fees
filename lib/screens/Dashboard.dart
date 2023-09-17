@@ -207,7 +207,7 @@ class _DashboardState extends State<Dashboard> {
 
                           if (int.parse(
                                   _amountController.text.replaceAll(',', '')) >
-                              20000) {
+                              35000) {
                             setState(() {
                               atmNotSupported = true;
                             });
