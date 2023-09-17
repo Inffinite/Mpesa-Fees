@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       title: 'Mpesa Fees',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
       ),
       home: const Dashboard(),
     );
