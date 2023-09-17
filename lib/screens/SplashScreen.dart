@@ -51,40 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   borderRadius: BorderRadius.circular(20.0),
                   color: Colors.white,
                 ),
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Container(
-                        width: 20.0,
-                        height: 70.0,
-                        decoration: BoxDecoration(
-                          color: Color(0xff6FBF69),
-                          borderRadius: BorderRadius.circular(3.0),
-                        ),
-                      ),
-                      SizedBox(width: 15.0),
-                      Container(
-                        width: 20.0,
-                        height: 100.0,
-                        decoration: BoxDecoration(
-                          color: Color(0xff52B44B),
-                          borderRadius: BorderRadius.circular(3.0),
-                        ),
-                      ),
-                      SizedBox(width: 15.0),
-                      Container(
-                        width: 20.0,
-                        height: 40.0,
-                        decoration: BoxDecoration(
-                          color: Color(0xffA1D99C),
-                          borderRadius: BorderRadius.circular(3.0),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                child: Center(child: Text("Mpesa Fees")),
               ),
             ),
           ),

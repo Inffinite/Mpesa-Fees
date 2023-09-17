@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mpesafees/database/database_helper.dart';
 
 import '../data/data.dart';
 import '../widgets/AmountTag.dart';
@@ -16,6 +17,8 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  final _dbHelper = DatabaseHelper.instance;
+
   final TextEditingController _amountController = TextEditingController();
   static const _locale = 'en';
   String _formatNumber(String s) =>
@@ -140,6 +143,28 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
+  checkTheme() async {
+    var rows = await _dbHelper.queryAllRows("mpesafeesInfo");
+
+    if (rows[0]['theme'] == "light") {
+      setState(() {
+        mptheme = "light";
+      });
+    } else {
+      setState(() {
+        mptheme = "dark";
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    checkTheme();
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -148,15 +173,33 @@ class _DashboardState extends State<Dashboard> {
         floatingActionButton: FloatingActionButton(
           backgroundColor: grn,
           elevation: 5.0,
-          onPressed: () {
+          onPressed: () async {
             if (mptheme == "light") {
               setState(() {
                 mptheme = "dark";
               });
+
+              var rowCount = await _dbHelper.queryRowCount("mpesafeesInfo");
+
+              if (rowCount == 0) {
+                await _dbHelper.insert({"theme": "dark"}, "mpesafeesInfo");
+              } else {
+                await _dbHelper
+                    .update({"_id": 1, "theme": "dark"}, "mpesafeesInfo");
+              }
             } else {
               setState(() {
                 mptheme = "light";
               });
+
+              var rowCount = await _dbHelper.queryRowCount("mpesafeesInfo");
+
+              if (rowCount == 0) {
+                await _dbHelper.insert({"theme": "light"}, "mpesafeesInfo");
+              } else {
+                await _dbHelper
+                    .update({"_id": 1, "theme": "light"}, "mpesafeesInfo");
+              }
             }
           },
           child: Container(
