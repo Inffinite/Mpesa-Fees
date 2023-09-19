@@ -418,6 +418,74 @@ class _DashboardState extends State<Dashboard> {
                     ),
                     const SizedBox(height: 30.0),
                     TitleTab(
+                      title:
+                          "Sending to pochi la biashara and business till to customer",
+                      mptheme: mptheme,
+                    ),
+                    const SizedBox(height: 15.0),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      decoration: BoxDecoration(
+                        color: grn.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Column(
+                        children: [
+                          AmountTag(
+                              title: "Amount to send",
+                              amount: notSupported == true
+                                  ? "N/A"
+                                  : _formatNumber(amountToSendOne
+                                      .toString()
+                                      .replaceAll(',', ''))),
+                          Divider(
+                            color: grn.withOpacity(0.1),
+                            thickness: 2.0,
+                          ),
+                          AmountTag(
+                            title: "Account minimum balance",
+                            amount: notSupported == true
+                                ? "N/A"
+                                : _formatNumber(
+                                    minimumBalanceOne
+                                        .toString()
+                                        .replaceAll(',', ''),
+                                  ),
+                          ),
+                          Divider(
+                            color: grn.withOpacity(0.1),
+                            thickness: 2.0,
+                          ),
+                          AmountTag(
+                            title: "Sending fee",
+                            amount: notSupported == true
+                                ? "N/A"
+                                : _formatNumber(
+                                    sendingFeeOne
+                                        .toString()
+                                        .replaceAll(',', ''),
+                                  ),
+                          ),
+                          Divider(
+                            color: grn.withOpacity(0.1),
+                            thickness: 2.0,
+                          ),
+                          AmountTag(
+                            title: "Withdrawal charge",
+                            amount: notSupported == true
+                                ? "N/A"
+                                : _formatNumber(
+                                    agentWithdrawalFee
+                                        .toString()
+                                        .replaceAll(',', ''),
+                                  ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 30.0),
+                    TitleTab(
                       title: "Sending to an unregistered number",
                       mptheme: mptheme,
                     ),
