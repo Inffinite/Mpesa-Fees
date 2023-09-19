@@ -171,6 +171,8 @@ class _DashboardState extends State<Dashboard> {
       onWillPop: () async => false,
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
+          enableFeedback: true,
+          tooltip: "Theme",
           backgroundColor: grn,
           elevation: 5.0,
           onPressed: () async {
@@ -226,6 +228,23 @@ class _DashboardState extends State<Dashboard> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 50.0),
+                    // Padding(
+                    //   padding: EdgeInsets.only(left: 20.0, right: 20.0),
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //     children: [
+                    //       Container(),
+                    //       Container(
+                    //         child: Icon(
+                    //           CupertinoIcons.question_circle_fill,
+                    //           color: mptheme == "light" ? white : darkBlack,
+                    //           size: 25.0,
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 20.0),
                     Text(
                       "Amount you wish to send",
                       style: TextStyle(
