@@ -14,15 +14,17 @@ class TitleTab extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.only(
-        top: 10.0,
-        bottom: 10.0,
+        top: 15.0,
+        bottom: 15.0,
         left: 20.0,
         right: 20.0,
       ),
       decoration: BoxDecoration(
-        color: const Color(0xff52B44B),
-        borderRadius: BorderRadius.circular(5.0),
-      ),
+          color: Color(0xff52B44B),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20.0),
+            topRight: Radius.circular(20.0),
+          )),
       child: Text(
         title,
         style: TextStyle(

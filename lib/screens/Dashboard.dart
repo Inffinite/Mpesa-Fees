@@ -1,9 +1,13 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mpesafees/database/database_helper.dart';
+import 'package:http/http.dart' as http;
 
 import '../data/data.dart';
 import '../widgets/AmountTag.dart';
@@ -27,6 +31,8 @@ class _DashboardState extends State<Dashboard> {
   final NumberFormat currencyFormat =
       NumberFormat.currency(locale: 'en_US', symbol: '\$');
 
+  TextEditingController messagecontroller = TextEditingController();
+
   var statusMessage = "";
 
   var minimumBalanceOne = 0;
@@ -45,12 +51,16 @@ class _DashboardState extends State<Dashboard> {
   var notSupported = false;
   var atmNotSupported = false;
 
+  String buttonState = "notloading";
+
   var mptheme = "light";
 
   Color grn = Color(0xff52B44B);
   Color white = Colors.white;
 
   Color darkBlack = Color(0xff000000);
+
+  var sendBtnText = "Send";
 
   calculateUnregisteredFees() {
     for (var i = 0; i < unregisteredUsers.length; i++) {
@@ -157,6 +167,168 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
+  sendHome(message) async {
+    setState(() {
+      buttonState = 'loading';
+    });
+    final res = await http.Client().post(
+      Uri.parse(dotenv.env['URL'].toString()),
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode({
+        'content': '**PIREMOTE FEEDBACK MESSAGE**\n$message',
+        'name': dotenv.env['USERNAME'],
+        'type': dotenv.env['TYPE'],
+        'token': dotenv.env['TOKEN']
+      }),
+    );
+
+    setState(() {
+      buttonState = 'notloading';
+    });
+    return;
+  }
+
+  buttonStatus() {
+    switch (buttonState) {
+      case "loading":
+        return LoadingAnimationWidget.staggeredDotsWave(
+          color: Colors.white,
+          size: 25.0,
+        );
+      case "notloading":
+        return Text(
+          'Send',
+          style: TextStyle(
+            fontSize: 16.0,
+            color: Color(0xff52B44B),
+            fontFamily: "AR",
+          ),
+        );
+    }
+  }
+
+  feedbackModal(context) {
+    showModalBottomSheet(
+      showDragHandle: true,
+      backgroundColor: Color(0xff52B44B),
+      isScrollControlled: true,
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(builder: (context, StateSetter setState) {
+          return Wrap(
+            children: [
+              SizedBox(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        "Feedback",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22.0,
+                        ),
+                      ),
+                      const SizedBox(height: 5.0),
+                      Text(
+                        "Tell us what you think",
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.6),
+                          fontWeight: FontWeight.normal,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                      const SizedBox(height: 20.0),
+                      CupertinoTextField(
+                        padding: EdgeInsets.all(20.0),
+                        decoration: BoxDecoration(
+                            color: Color.fromARGB(255, 72, 160, 65),
+                            borderRadius: BorderRadius.circular(20.0)),
+                        scrollPhysics: const BouncingScrollPhysics(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                        ),
+                        controller: messagecontroller,
+                        onChanged: (text) {},
+                        cursorColor: Colors.white,
+                        maxLines: 10,
+                        placeholder: "Whats on your mind...",
+                        obscureText: false,
+                        placeholderStyle: TextStyle(
+                          color: Colors.white.withOpacity(0.5),
+                          fontFamily: "SFNSR",
+                          fontSize: 18.0,
+                        ),
+                      ),
+                      const SizedBox(height: 5.0),
+                      Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(
+                          bottom: 10.0,
+                          left: 0.0,
+                          right: 0.0,
+                          top: 20.0,
+                        ),
+                        child: CupertinoButton(
+                          padding: const EdgeInsets.only(
+                            top: 15.0,
+                            bottom: 15.0,
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                          color: Colors.white,
+                          child: Text(
+                            sendBtnText,
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              color: Color(0xff52B44B),
+                              fontFamily: "AR",
+                            ),
+                          ),
+                          onPressed: () {
+                            if (sendBtnText != "Message sent successfully!") {
+                              setState(() {
+                                sendBtnText = "Sending...";
+                              });
+                              var mymessage = messagecontroller.text;
+                              if (mymessage.length == 0) {
+                                print("DO NOTHING");
+                              } else {
+                                sendHome(messagecontroller.text);
+                                messagecontroller.text = "";
+                                setState(() {
+                                  sendBtnText = "Message sent successfully!";
+                                });
+                              }
+                            } else {
+                              log("Can't send twice in a row.");
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 10.0),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        });
+      },
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20.0),
+          topRight: Radius.circular(20.0),
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -170,55 +342,131 @@ class _DashboardState extends State<Dashboard> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          enableFeedback: true,
-          tooltip: "Theme",
-          backgroundColor: grn,
-          elevation: 5.0,
-          onPressed: () async {
-            if (mptheme == "light") {
-              setState(() {
-                mptheme = "dark";
-              });
+        // floatingActionButton: FloatingActionButton(
+        //   enableFeedback: true,
+        //   tooltip: "Theme",
+        //   backgroundColor: grn,
+        //   elevation: 5.0,
+        //   onPressed: () async {
+        //     if (mptheme == "light") {
+        //       setState(() {
+        //         mptheme = "dark";
+        //       });
 
-              var rowCount = await _dbHelper.queryRowCount("mpesafeesInfo");
+        //       var rowCount = await _dbHelper.queryRowCount("mpesafeesInfo");
 
-              if (rowCount == 0) {
-                await _dbHelper.insert({"theme": "dark"}, "mpesafeesInfo");
-              } else {
-                await _dbHelper
-                    .update({"_id": 1, "theme": "dark"}, "mpesafeesInfo");
-              }
-            } else {
-              setState(() {
-                mptheme = "light";
-              });
+        //       if (rowCount == 0) {
+        //         await _dbHelper.insert({"theme": "dark"}, "mpesafeesInfo");
+        //       } else {
+        //         await _dbHelper
+        //             .update({"_id": 1, "theme": "dark"}, "mpesafeesInfo");
+        //       }
+        //     } else {
+        //       setState(() {
+        //         mptheme = "light";
+        //       });
 
-              var rowCount = await _dbHelper.queryRowCount("mpesafeesInfo");
+        //       var rowCount = await _dbHelper.queryRowCount("mpesafeesInfo");
 
-              if (rowCount == 0) {
-                await _dbHelper.insert({"theme": "light"}, "mpesafeesInfo");
-              } else {
-                await _dbHelper
-                    .update({"_id": 1, "theme": "light"}, "mpesafeesInfo");
-              }
-            }
-          },
-          child: Container(
-            child: Icon(
-              mptheme == "light"
-                  ? CupertinoIcons.moon_fill
-                  : CupertinoIcons.sun_max_fill,
-              color: mptheme == "light" ? white : darkBlack,
+        //       if (rowCount == 0) {
+        //         await _dbHelper.insert({"theme": "light"}, "mpesafeesInfo");
+        //       } else {
+        //         await _dbHelper
+        //             .update({"_id": 1, "theme": "light"}, "mpesafeesInfo");
+        //       }
+        //     }
+        //   },
+        //   child: Container(
+        //     child: Icon(
+        //       mptheme == "light"
+        //           ? CupertinoIcons.moon_fill
+        //           : CupertinoIcons.sun_max_fill,
+        //       color: mptheme == "light" ? white : darkBlack,
+        //     ),
+        //   ),
+        // ),
+        backgroundColor: mptheme == "light" ? white : darkBlack,
+        appBar: AppBar(
+          title: Text(
+            "Mpesa Fees",
+            style: TextStyle(
+              fontSize: 18.0,
+              fontFamily: "SFT-Bold",
+              color: mptheme == "light" ? Colors.white : Colors.black,
             ),
           ),
+          leading: Container(
+            margin: EdgeInsets.only(
+              left: 15.0,
+            ),
+            child: IconButton(
+              icon: Icon(
+                mptheme == "dark" ? Icons.light_mode : Icons.dark_mode,
+                size: 26.0,
+                color: mptheme == "light" ? Colors.white : Colors.black,
+              ),
+              onPressed: () async {
+                if (mptheme == "light") {
+                  setState(() {
+                    mptheme = "dark";
+                  });
+
+                  var rowCount = await _dbHelper.queryRowCount("mpesafeesInfo");
+
+                  if (rowCount == 0) {
+                    await _dbHelper.insert({"theme": "dark"}, "mpesafeesInfo");
+                  } else {
+                    await _dbHelper
+                        .update({"_id": 1, "theme": "dark"}, "mpesafeesInfo");
+                  }
+                } else {
+                  setState(() {
+                    mptheme = "light";
+                  });
+
+                  var rowCount = await _dbHelper.queryRowCount("mpesafeesInfo");
+
+                  if (rowCount == 0) {
+                    await _dbHelper.insert({"theme": "light"}, "mpesafeesInfo");
+                  } else {
+                    await _dbHelper
+                        .update({"_id": 1, "theme": "light"}, "mpesafeesInfo");
+                  }
+                }
+              },
+            ),
+          ),
+          actions: [
+            Container(
+              margin: EdgeInsets.only(
+                right: 15.0,
+              ),
+              child: IconButton(
+                icon: Icon(
+                  CupertinoIcons.chat_bubble_2_fill,
+                  size: 26.0,
+                  color: mptheme == "light" ? Colors.white : Colors.black,
+                ),
+                onPressed: () {
+                  setState(() {
+                    sendBtnText = "Send";
+                    messagecontroller.text = "";
+                  });
+
+                  feedbackModal(context);
+                },
+              ),
+            ),
+          ],
+          centerTitle: true,
+          elevation: 0.0,
+          backgroundColor: Color(0xff52B44B),
         ),
-        backgroundColor: mptheme == "light" ? white : darkBlack,
         body: SingleChildScrollView(
           child: Column(
             children: [
               Container(
-                height: 200.0,
+                height: 130.0,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: grn,
@@ -227,7 +475,7 @@ class _DashboardState extends State<Dashboard> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 50.0),
+                    const SizedBox(height: 0.0),
                     // Padding(
                     //   padding: EdgeInsets.only(left: 20.0, right: 20.0),
                     //   child: Row(
@@ -249,7 +497,7 @@ class _DashboardState extends State<Dashboard> {
                       "Amount you wish to send",
                       style: TextStyle(
                         color: mptheme == "light" ? white : darkBlack,
-                        fontFamily: 'SFNSR',
+                        fontSize: 16.0,
                       ),
                     ),
                     const SizedBox(height: 8.0),
@@ -258,6 +506,7 @@ class _DashboardState extends State<Dashboard> {
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
                       placeholder: "0.0",
+                      cursorOpacityAnimates: true,
                       placeholderStyle: TextStyle(
                         color: mptheme == "light"
                             ? white
@@ -265,8 +514,8 @@ class _DashboardState extends State<Dashboard> {
                       ),
                       style: TextStyle(
                         color: mptheme == "light" ? white : darkBlack,
-                        fontFamily: 'SFT-Bold',
-                        fontSize: 32.0,
+                        fontFamily: "SFT-Bold",
+                        fontSize: 35.0,
                       ),
                       controller: _amountController,
                       decoration: const BoxDecoration(
@@ -373,13 +622,15 @@ class _DashboardState extends State<Dashboard> {
                       title: "Sending to a registered number",
                       mptheme: mptheme,
                     ),
-                    const SizedBox(height: 15.0),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 10.0),
                       decoration: BoxDecoration(
                         color: grn.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10.0),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(20.0),
+                          bottomRight: Radius.circular(20.0),
+                        ),
                       ),
                       child: Column(
                         children: [
@@ -441,13 +692,15 @@ class _DashboardState extends State<Dashboard> {
                           "Sending to pochi la biashara and business till to customer",
                       mptheme: mptheme,
                     ),
-                    const SizedBox(height: 15.0),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 10.0),
                       decoration: BoxDecoration(
                         color: grn.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10.0),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(20.0),
+                          bottomRight: Radius.circular(20.0),
+                        ),
                       ),
                       child: Column(
                         children: [
@@ -508,13 +761,15 @@ class _DashboardState extends State<Dashboard> {
                       title: "Sending to an unregistered number",
                       mptheme: mptheme,
                     ),
-                    const SizedBox(height: 15.0),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 10.0),
                       decoration: BoxDecoration(
                         color: grn.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10.0),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(20.0),
+                          bottomRight: Radius.circular(20.0),
+                        ),
                       ),
                       child: Column(
                         children: [
@@ -550,13 +805,15 @@ class _DashboardState extends State<Dashboard> {
                       title: "Withdraw at an agent",
                       mptheme: mptheme,
                     ),
-                    const SizedBox(height: 15.0),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 10.0),
                       decoration: BoxDecoration(
                         color: grn.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10.0),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(20.0),
+                          bottomRight: Radius.circular(20.0),
+                        ),
                       ),
                       child: Column(
                         children: [
@@ -592,13 +849,15 @@ class _DashboardState extends State<Dashboard> {
                       title: "Withdraw at an ATM",
                       mptheme: mptheme,
                     ),
-                    const SizedBox(height: 15.0),
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 10.0),
                       decoration: BoxDecoration(
                         color: grn.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10.0),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(20.0),
+                          bottomRight: Radius.circular(20.0),
+                        ),
                       ),
                       child: Column(
                         children: [

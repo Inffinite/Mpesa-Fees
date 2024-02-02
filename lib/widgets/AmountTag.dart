@@ -1,15 +1,22 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class AmountTag extends StatelessWidget {
+class AmountTag extends StatefulWidget {
   final String title;
-  final String amount;
+  String amount;
 
   AmountTag({
     required this.title,
     required this.amount,
   });
 
+  @override
+  State<AmountTag> createState() => _AmountTagState();
+}
+
+class _AmountTagState extends State<AmountTag> {
   copyToClipboard(value) {
     Clipboard.setData(
         ClipboardData(text: '${int.parse(value.replaceAll(',', ''))}'));
@@ -36,13 +43,27 @@ class AmountTag extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        copyToClipboard(amount);
-        showToast(context, "Copied to clipboard");
+        if (widget.amount != "N/A") {
+          var value = widget.amount;
+          copyToClipboard(widget.amount);
+          setState(() {
+            widget.amount = "Copied...";
+          });
+
+          var timer = Timer(
+              Duration(seconds: 2),
+              () => {
+                    setState(() {
+                      widget.amount = value;
+                    })
+                  });
+        }
+        // showToast(context, "Copied to clipboard");
       },
       child: Container(
         padding: const EdgeInsets.only(
-          left: 15.0,
-          right: 15.0,
+          left: 20.0,
+          right: 20.0,
           top: 8.0,
           bottom: 8.0,
         ),
@@ -51,20 +72,21 @@ class AmountTag extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              title,
+              widget.title,
               textAlign: TextAlign.start,
               style: const TextStyle(
-                  color: Color(0xff52B44B),
-                  fontSize: 14.0,
-                  fontFamily: "SFNSR"),
+                color: Color(0xff52B44B),
+                fontSize: 16.0,
+                fontFamily: "SFNSR",
+              ),
             ),
-            const SizedBox(height: 5.0),
+            const SizedBox(height: 8.0),
             Text(
-              amount,
+              widget.amount,
               textAlign: TextAlign.start,
               style: const TextStyle(
                 fontFamily: "SFT-Bold",
-                fontSize: 24.0,
+                fontSize: 26.0,
                 color: Color(0xff52B44B),
               ),
             ),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mpesafees/screens/Dashboard.dart';
 import 'package:mpesafees/screens/SplashScreen.dart';
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: '.env');
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Color(0xff52B44B),
