@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mpesafees/database/database_helper.dart';
@@ -20,8 +22,14 @@ class Dashboard extends StatefulWidget {
   State<Dashboard> createState() => _DashboardState();
 }
 
+enum Availability { loading, available, unavailable }
+
 class _DashboardState extends State<Dashboard> {
+  final InAppReview _inAppReview = InAppReview.instance;
   final _dbHelper = DatabaseHelper.instance;
+
+  String _appStoreId = 'com.wrenix.mpesafees';
+  Availability _availability = Availability.loading;
 
   final TextEditingController _amountController = TextEditingController();
   static const _locale = 'en';
@@ -167,6 +175,53 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
+  checkDay() {
+    final now = DateTime.now();
+    return now.day;
+  }
+
+  setupDayOfInstall() async {
+    var rowCount = await _dbHelper.queryRowCount("dayOfInstall");
+
+    var today = checkDay();
+
+    if (rowCount == 0) {
+      await _dbHelper.insert({"day": today}, "dayOfInstall");
+    } else {
+      var rows = await _dbHelper.queryAllRows("dayOfInstall");
+
+      print("[+] DAY ADDED: ${rows[0]['day']}");
+
+      if (rows[0]['day'] != today) {
+        addReview();
+      }
+    }
+  }
+
+  setupReview() async {
+    var rowCount = await _dbHelper.queryRowCount("review");
+
+    // 0 - user has not reviewed us
+    // 1 - user has reviewed us
+
+    if (rowCount == 0) {
+      log("No rows");
+      await _dbHelper.insert({"reviewed": 0}, "review");
+    }
+  }
+
+  addReview() async {
+    var rows = await _dbHelper.queryAllRows("review");
+
+    if (rows[0]['reviewed'] == 0) {
+      _requestReview();
+      await _dbHelper.update({"_id": 1, "reviewed": 1}, "review");
+      log("Reviewed successfully");
+    } else {
+      log("Already reviewed");
+    }
+  }
+
   sendHome(message) async {
     setState(() {
       buttonState = 'loading';
@@ -177,7 +232,7 @@ class _DashboardState extends State<Dashboard> {
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode({
-        'content': '**PIREMOTE FEEDBACK MESSAGE**\n$message',
+        'content': '**MPESA FEES FEEDBACK MESSAGE**\n$message',
         'name': dotenv.env['USERNAME'],
         'type': dotenv.env['TYPE'],
         'token': dotenv.env['TOKEN']
@@ -217,106 +272,110 @@ class _DashboardState extends State<Dashboard> {
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(builder: (context, StateSetter setState) {
-          return Wrap(
-            children: [
-              SizedBox(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        "Feedback",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22.0,
-                        ),
-                      ),
-                      const SizedBox(height: 5.0),
-                      Text(
-                        "Tell us what you think",
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
-                          fontWeight: FontWeight.normal,
-                          fontSize: 16.0,
-                        ),
-                      ),
-                      const SizedBox(height: 20.0),
-                      CupertinoTextField(
-                        padding: EdgeInsets.all(20.0),
-                        decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 72, 160, 65),
-                            borderRadius: BorderRadius.circular(20.0)),
-                        scrollPhysics: const BouncingScrollPhysics(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18.0,
-                        ),
-                        controller: messagecontroller,
-                        onChanged: (text) {},
-                        cursorColor: Colors.white,
-                        maxLines: 10,
-                        placeholder: "Whats on your mind...",
-                        obscureText: false,
-                        placeholderStyle: TextStyle(
-                          color: Colors.white.withOpacity(0.5),
-                          fontFamily: "SFNSR",
-                          fontSize: 18.0,
-                        ),
-                      ),
-                      const SizedBox(height: 5.0),
-                      Container(
-                        width: double.infinity,
-                        margin: const EdgeInsets.only(
-                          bottom: 10.0,
-                          left: 0.0,
-                          right: 0.0,
-                          top: 20.0,
-                        ),
-                        child: CupertinoButton(
-                          padding: const EdgeInsets.only(
-                            top: 15.0,
-                            bottom: 15.0,
+          return Padding(
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Wrap(
+              children: [
+                SizedBox(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          "Feedback",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22.0,
                           ),
-                          borderRadius: BorderRadius.circular(20.0),
-                          color: Colors.white,
-                          child: Text(
-                            sendBtnText,
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              color: Color(0xff52B44B),
-                              fontFamily: "AR",
+                        ),
+                        const SizedBox(height: 5.0),
+                        Text(
+                          "Give us your ideas for new features",
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontWeight: FontWeight.normal,
+                            fontSize: 16.0,
+                          ),
+                        ),
+                        const SizedBox(height: 20.0),
+                        CupertinoTextField(
+                          padding: EdgeInsets.all(20.0),
+                          decoration: BoxDecoration(
+                              color: Color.fromARGB(255, 71, 160, 65),
+                              borderRadius: BorderRadius.circular(20.0)),
+                          scrollPhysics: const BouncingScrollPhysics(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.0,
+                          ),
+                          controller: messagecontroller,
+                          onChanged: (text) {},
+                          cursorColor: Colors.white,
+                          maxLines: 5,
+                          placeholder: "Whats on your mind...",
+                          obscureText: false,
+                          placeholderStyle: TextStyle(
+                            color: Colors.white.withOpacity(0.5),
+                            fontFamily: "SFNSR",
+                            fontSize: 18.0,
+                          ),
+                        ),
+                        const SizedBox(height: 5.0),
+                        Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(
+                            bottom: 10.0,
+                            left: 0.0,
+                            right: 0.0,
+                            top: 10.0,
+                          ),
+                          child: CupertinoButton(
+                            padding: const EdgeInsets.only(
+                              top: 15.0,
+                              bottom: 15.0,
                             ),
-                          ),
-                          onPressed: () {
-                            if (sendBtnText != "Message sent successfully!") {
-                              setState(() {
-                                sendBtnText = "Sending...";
-                              });
-                              var mymessage = messagecontroller.text;
-                              if (mymessage.length == 0) {
-                                print("DO NOTHING");
-                              } else {
-                                sendHome(messagecontroller.text);
-                                messagecontroller.text = "";
+                            borderRadius: BorderRadius.circular(10.0),
+                            color: Colors.white,
+                            child: Text(
+                              sendBtnText,
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                color: Color(0xff52B44B),
+                                fontFamily: "AR",
+                              ),
+                            ),
+                            onPressed: () {
+                              if (sendBtnText != "Message sent successfully!") {
                                 setState(() {
-                                  sendBtnText = "Message sent successfully!";
+                                  sendBtnText = "Sending...";
                                 });
+                                var mymessage = messagecontroller.text;
+                                if (mymessage.length == 0) {
+                                  print("DO NOTHING");
+                                } else {
+                                  sendHome(messagecontroller.text);
+                                  messagecontroller.text = "";
+                                  setState(() {
+                                    sendBtnText = "Message sent successfully!";
+                                  });
+                                }
+                              } else {
+                                log("Can't send twice in a row.");
                               }
-                            } else {
-                              log("Can't send twice in a row.");
-                            }
-                          },
+                            },
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 10.0),
-                    ],
+                        const SizedBox(height: 10.0),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         });
       },
@@ -329,12 +388,37 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
+  Future<void> _requestReview() => _inAppReview.requestReview();
+
+  Future<void> _openStoreListing() => _inAppReview.openStoreListing(
+        appStoreId: _appStoreId,
+      );
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
     checkTheme();
+    checkDay();
+    setupReview();
+    (<T>(T? o) => o!)(WidgetsBinding.instance).addPostFrameCallback((_) async {
+      try {
+        final isAvailable = await _inAppReview.isAvailable();
+
+        setState(() {
+          // This plugin cannot be tested on Android by installing your app
+          // locally. See https://github.com/britannio/in_app_review#testing for
+          // more information.
+          _availability = isAvailable && !Platform.isAndroid
+              ? Availability.available
+              : Availability.unavailable;
+        });
+      } catch (_) {
+        setState(() => _availability = Availability.unavailable);
+      }
+    });
+
+    setupDayOfInstall();
   }
 
   @override

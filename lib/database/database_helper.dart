@@ -36,6 +36,22 @@ class DatabaseHelper {
           theme TEXT NOT NULL
         )
         ''');
+
+    await db.execute('''
+        CREATE TABLE review (
+          _id INTEGER PRIMARY KEY,
+          reviewed INTEGER
+        )
+        ''');
+
+    // How many times has the app been opened
+    // Ask them to review us on the 5th launch
+    await db.execute('''
+        CREATE TABLE dayOfInstall (
+          _id INTEGER PRIMARY KEY,
+          day INTEGER
+        )
+        ''');
   }
 
   Future<int> insert(Map<String, dynamic> row, mytable) async {
