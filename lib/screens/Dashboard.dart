@@ -399,8 +399,6 @@ class _DashboardState extends State<Dashboard> {
     // TODO: implement initState
     super.initState();
     checkTheme();
-    checkDay();
-    setupReview();
     (<T>(T? o) => o!)(WidgetsBinding.instance).addPostFrameCallback((_) async {
       try {
         final isAvailable = await _inAppReview.isAvailable();
@@ -418,7 +416,7 @@ class _DashboardState extends State<Dashboard> {
       }
     });
 
-    setupDayOfInstall();
+    setupReview();
   }
 
   @override
@@ -426,49 +424,6 @@ class _DashboardState extends State<Dashboard> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        // floatingActionButton: FloatingActionButton(
-        //   enableFeedback: true,
-        //   tooltip: "Theme",
-        //   backgroundColor: grn,
-        //   elevation: 5.0,
-        //   onPressed: () async {
-        //     if (mptheme == "light") {
-        //       setState(() {
-        //         mptheme = "dark";
-        //       });
-
-        //       var rowCount = await _dbHelper.queryRowCount("mpesafeesInfo");
-
-        //       if (rowCount == 0) {
-        //         await _dbHelper.insert({"theme": "dark"}, "mpesafeesInfo");
-        //       } else {
-        //         await _dbHelper
-        //             .update({"_id": 1, "theme": "dark"}, "mpesafeesInfo");
-        //       }
-        //     } else {
-        //       setState(() {
-        //         mptheme = "light";
-        //       });
-
-        //       var rowCount = await _dbHelper.queryRowCount("mpesafeesInfo");
-
-        //       if (rowCount == 0) {
-        //         await _dbHelper.insert({"theme": "light"}, "mpesafeesInfo");
-        //       } else {
-        //         await _dbHelper
-        //             .update({"_id": 1, "theme": "light"}, "mpesafeesInfo");
-        //       }
-        //     }
-        //   },
-        //   child: Container(
-        //     child: Icon(
-        //       mptheme == "light"
-        //           ? CupertinoIcons.moon_fill
-        //           : CupertinoIcons.sun_max_fill,
-        //       color: mptheme == "light" ? white : darkBlack,
-        //     ),
-        //   ),
-        // ),
         backgroundColor: mptheme == "light" ? white : darkBlack,
         appBar: AppBar(
           title: Text(
@@ -560,23 +515,6 @@ class _DashboardState extends State<Dashboard> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 0.0),
-                    // Padding(
-                    //   padding: EdgeInsets.only(left: 20.0, right: 20.0),
-                    //   child: Row(
-                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //     children: [
-                    //       Container(),
-                    //       Container(
-                    //         child: Icon(
-                    //           CupertinoIcons.question_circle_fill,
-                    //           color: mptheme == "light" ? white : darkBlack,
-                    //           size: 25.0,
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    // const SizedBox(height: 20.0),
                     Text(
                       "Amount you wish to send",
                       style: TextStyle(
@@ -597,7 +535,6 @@ class _DashboardState extends State<Dashboard> {
                             : darkBlack.withOpacity(0.3),
                       ),
                       style: TextStyle(
-                        color: mptheme == "light" ? white : darkBlack,
                         fontFamily: "SFT-Bold",
                         fontSize: 35.0,
                       ),
@@ -974,6 +911,12 @@ class _DashboardState extends State<Dashboard> {
                         ],
                       ),
                     ),
+                    SizedBox(height: 25.0),
+                    Text(
+                      "Powered by Wrenix Studio",
+                      style: TextStyle(color: grn, fontSize: 12.0),
+                    ),
+                    SizedBox(height: 5.0),
                   ],
                 ),
               ),
