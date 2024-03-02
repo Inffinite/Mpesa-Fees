@@ -47,11 +47,11 @@ class _AmountTagState extends State<AmountTag> {
           var value = widget.amount;
           copyToClipboard(widget.amount);
           setState(() {
-            widget.amount = "Copied...";
+            widget.amount = "Copied to clipboard";
           });
 
           var timer = Timer(
-              Duration(seconds: 2),
+              Duration(seconds: 1),
               () => {
                     setState(() {
                       widget.amount = value;
@@ -84,9 +84,9 @@ class _AmountTagState extends State<AmountTag> {
             Text(
               widget.amount,
               textAlign: TextAlign.start,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: "SFT-Bold",
-                fontSize: 26.0,
+                fontSize: widget.amount == "Copied to clipboard" ? 16.0 : 26.0,
                 color: Color(0xff52B44B),
               ),
             ),

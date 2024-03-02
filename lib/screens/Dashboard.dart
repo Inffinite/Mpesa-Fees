@@ -388,6 +388,16 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
+  checkKeyboard() {
+    bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+
+    if (isKeyboardOpen) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   Future<void> _requestReview() => _inAppReview.requestReview();
 
   Future<void> _openStoreListing() => _inAppReview.openStoreListing(
@@ -425,6 +435,14 @@ class _DashboardState extends State<Dashboard> {
       onWillPop: () async => false,
       child: Scaffold(
         backgroundColor: mptheme == "light" ? white : darkBlack,
+        floatingActionButton: checkKeyboard()
+            ? FloatingActionButton(
+                onPressed: () {
+                  _amountController.clear();
+                },
+                child: Icon(Icons.clear),
+              )
+            : Container(),
         appBar: AppBar(
           title: Text(
             "Mpesa Fees",
@@ -487,6 +505,7 @@ class _DashboardState extends State<Dashboard> {
                   color: mptheme == "light" ? Colors.white : Colors.black,
                 ),
                 onPressed: () {
+                  _amountController.clear();
                   setState(() {
                     sendBtnText = "Send";
                     messagecontroller.text = "";
@@ -525,18 +544,20 @@ class _DashboardState extends State<Dashboard> {
                     const SizedBox(height: 8.0),
                     CupertinoTextField(
                       cursorColor: mptheme == "light" ? white : darkBlack,
+                      autofocus: true,
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
-                      placeholder: "0.0",
+                      placeholder: "ksh 0",
                       cursorOpacityAnimates: true,
                       placeholderStyle: TextStyle(
                         color: mptheme == "light"
-                            ? white
+                            ? white.withOpacity(0.3)
                             : darkBlack.withOpacity(0.3),
                       ),
                       style: TextStyle(
                         fontFamily: "SFT-Bold",
                         fontSize: 35.0,
+                        color: mptheme == "light" ? white : darkBlack,
                       ),
                       controller: _amountController,
                       decoration: const BoxDecoration(
