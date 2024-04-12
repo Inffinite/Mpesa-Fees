@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:intl/intl.dart';
@@ -431,517 +432,541 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        backgroundColor: mptheme == "light" ? white : darkBlack,
-        floatingActionButton: checkKeyboard()
-            ? FloatingActionButton(
-                onPressed: () {
-                  _amountController.clear();
-                },
-                child: Icon(Icons.clear),
-              )
-            : Container(),
-        appBar: AppBar(
-          title: Text(
-            "Mpesa Fees",
-            style: TextStyle(
-              fontSize: 18.0,
-              fontFamily: "SFT-Bold",
-              color: mptheme == "light" ? Colors.white : Colors.black,
+    return PopScope(
+      canPop: false,
+      child: AnnotatedRegion(
+        value: SystemUiOverlayStyle(
+          systemNavigationBarContrastEnforced: false,
+          systemNavigationBarColor: mptheme == "light" ? white : darkBlack,
+          statusBarColor: Color(0xff52B44B),
+          statusBarBrightness: Brightness.dark,
+        ),
+        child: Scaffold(
+          backgroundColor: mptheme == "light" ? white : darkBlack,
+          floatingActionButton: checkKeyboard()
+              ? FloatingActionButton(
+                  backgroundColor: Color(0xff52B44B),
+                  onPressed: () {
+                    _amountController.clear();
+                  },
+                  child: Icon(
+                    Icons.clear,
+                    color: mptheme == "light" ? white : darkBlack,
+                  ),
+                )
+              : Container(),
+          appBar: AppBar(
+            systemOverlayStyle: SystemUiOverlayStyle(
+              statusBarColor:
+                  Color(0xff52B44B), // Set your desired status bar color
+              statusBarIconBrightness: mptheme == 'light'
+                  ? Brightness.light
+                  : Brightness.dark, // Optional: Set icon brightness
             ),
-          ),
-          leading: Container(
-            margin: EdgeInsets.only(
-              left: 15.0,
-            ),
-            child: IconButton(
-              icon: Icon(
-                mptheme == "dark" ? Icons.light_mode : Icons.dark_mode,
-                size: 26.0,
+            surfaceTintColor: Color(0xff52B44B),
+            title: Text(
+              "Mpesa Fees",
+              style: TextStyle(
+                fontSize: 18.0,
+                fontFamily: "SFT-Bold",
                 color: mptheme == "light" ? Colors.white : Colors.black,
               ),
-              onPressed: () async {
-                if (mptheme == "light") {
-                  setState(() {
-                    mptheme = "dark";
-                  });
-
-                  var rowCount = await _dbHelper.queryRowCount("mpesafeesInfo");
-
-                  if (rowCount == 0) {
-                    await _dbHelper.insert({"theme": "dark"}, "mpesafeesInfo");
-                  } else {
-                    await _dbHelper
-                        .update({"_id": 1, "theme": "dark"}, "mpesafeesInfo");
-                  }
-                } else {
-                  setState(() {
-                    mptheme = "light";
-                  });
-
-                  var rowCount = await _dbHelper.queryRowCount("mpesafeesInfo");
-
-                  if (rowCount == 0) {
-                    await _dbHelper.insert({"theme": "light"}, "mpesafeesInfo");
-                  } else {
-                    await _dbHelper
-                        .update({"_id": 1, "theme": "light"}, "mpesafeesInfo");
-                  }
-                }
-              },
             ),
-          ),
-          actions: [
-            Container(
+            leading: Container(
               margin: EdgeInsets.only(
-                right: 15.0,
+                left: 15.0,
               ),
               child: IconButton(
                 icon: Icon(
-                  CupertinoIcons.chat_bubble_2_fill,
+                  mptheme == "dark" ? Icons.light_mode : Icons.dark_mode,
                   size: 26.0,
                   color: mptheme == "light" ? Colors.white : Colors.black,
                 ),
-                onPressed: () {
-                  _amountController.clear();
-                  setState(() {
-                    sendBtnText = "Send";
-                    messagecontroller.text = "";
-                  });
+                onPressed: () async {
+                  if (mptheme == "light") {
+                    setState(() {
+                      mptheme = "dark";
+                    });
 
-                  feedbackModal(context);
+                    var rowCount =
+                        await _dbHelper.queryRowCount("mpesafeesInfo");
+
+                    if (rowCount == 0) {
+                      await _dbHelper
+                          .insert({"theme": "dark"}, "mpesafeesInfo");
+                    } else {
+                      await _dbHelper
+                          .update({"_id": 1, "theme": "dark"}, "mpesafeesInfo");
+                    }
+                  } else {
+                    setState(() {
+                      mptheme = "light";
+                    });
+
+                    var rowCount =
+                        await _dbHelper.queryRowCount("mpesafeesInfo");
+
+                    if (rowCount == 0) {
+                      await _dbHelper
+                          .insert({"theme": "light"}, "mpesafeesInfo");
+                    } else {
+                      await _dbHelper.update(
+                          {"_id": 1, "theme": "light"}, "mpesafeesInfo");
+                    }
+                  }
                 },
               ),
             ),
-          ],
-          centerTitle: true,
-          elevation: 0.0,
-          backgroundColor: Color(0xff52B44B),
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
+            actions: [
               Container(
-                height: 130.0,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: grn,
+                margin: EdgeInsets.only(
+                  right: 15.0,
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 0.0),
-                    Text(
-                      "Amount you wish to send",
-                      style: TextStyle(
-                        color: mptheme == "light" ? white : darkBlack,
-                        fontSize: 16.0,
-                      ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    CupertinoTextField(
-                      cursorColor: mptheme == "light" ? white : darkBlack,
-                      autofocus: true,
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      placeholder: "ksh 0",
-                      cursorOpacityAnimates: true,
-                      placeholderStyle: TextStyle(
-                        color: mptheme == "light"
-                            ? white.withOpacity(0.3)
-                            : darkBlack.withOpacity(0.3),
-                      ),
-                      style: TextStyle(
-                        fontFamily: "SFT-Bold",
-                        fontSize: 35.0,
-                        color: mptheme == "light" ? white : darkBlack,
-                      ),
-                      controller: _amountController,
-                      decoration: const BoxDecoration(
-                        color: Colors.transparent,
-                      ),
-                      onChanged: (string) {
-                        setState(() {
-                          statusMessage = "";
-                        });
+                child: IconButton(
+                  icon: Icon(
+                    CupertinoIcons.chat_bubble_2_fill,
+                    size: 26.0,
+                    color: mptheme == "light" ? Colors.white : Colors.black,
+                  ),
+                  onPressed: () {
+                    _amountController.clear();
+                    setState(() {
+                      sendBtnText = "Send";
+                      messagecontroller.text = "";
+                    });
 
-                        if (string.isNotEmpty) {
-                          string = _formatNumber(string.replaceAll(',', ''));
-                          _amountController.value = TextEditingValue(
-                            text: string,
-                            selection:
-                                TextSelection.collapsed(offset: string.length),
-                          );
-
-                          if (string.replaceAll(',', '') == "6969") {
-                            setState(() {
-                              statusMessage = "Nice!";
-                            });
-                          }
-
-                          if (string.replaceAll(',', '') == "999999") {
-                            setState(() {
-                              statusMessage = "You wish!";
-                            });
-                          }
-
-                          print(string);
-
-                          if (int.parse(
-                                  _amountController.text.replaceAll(',', '')) >
-                              35000) {
-                            setState(() {
-                              atmNotSupported = true;
-                            });
-                          } else {
-                            setState(() {
-                              atmNotSupported = false;
-                            });
-                          }
-
-                          if (int.parse(
-                                  _amountController.text.replaceAll(',', '')) >
-                              150000) {
-                            setState(() {
-                              notSupported = true;
-                            });
-                          } else {
-                            notSupported = false;
-                            calculateFees();
-                            calculateUnregisteredFees();
-                          }
-                        } else {
-                          setState(() {
-                            minimumBalanceOne = 0;
-                            sendingFeeOne = 0;
-                            sendingFeeTwo = 0;
-                            amountToSendOne = 0;
-                            amountToSendTwo = 0;
-                            agentWithdrawalFee = 0;
-                            atmWithdrawalFee = 0;
-                            withdrawableAmountAgent = 0;
-                            withdrawableAmountAtm = 0;
-                          });
-                        }
-                      },
-                    ),
-                    SizedBox(height: 10.0),
-                    statusMessage.isEmpty
-                        ? Container()
-                        : Container(
-                            padding: EdgeInsets.only(
-                              top: 4.0,
-                              bottom: 4.0,
-                              left: 20.0,
-                              right: 20.0,
-                            ),
-                            decoration: BoxDecoration(
-                              color: mptheme == "light"
-                                  ? white
-                                  : darkBlack.withOpacity(0.3),
-                              borderRadius: BorderRadius.circular(50.0),
-                            ),
-                            child: Text(
-                              statusMessage,
-                              style: TextStyle(
-                                fontFamily: 'AR',
-                                color: mptheme == "light" ? white : darkBlack,
-                                fontSize: 12.0,
-                              ),
-                            ),
-                          ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  children: [
-                    TitleTab(
-                      title: "Sending to a registered number",
-                      mptheme: mptheme,
-                    ),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
-                      decoration: BoxDecoration(
-                        color: grn.withOpacity(0.1),
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20.0),
-                          bottomRight: Radius.circular(20.0),
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          AmountTag(
-                              title: "Amount to send",
-                              amount: notSupported == true
-                                  ? "N/A"
-                                  : _formatNumber(amountToSendOne
-                                      .toString()
-                                      .replaceAll(',', ''))),
-                          Divider(
-                            color: grn.withOpacity(0.1),
-                            thickness: 2.0,
-                          ),
-                          AmountTag(
-                            title: "Account minimum balance",
-                            amount: notSupported == true
-                                ? "N/A"
-                                : _formatNumber(
-                                    minimumBalanceOne
-                                        .toString()
-                                        .replaceAll(',', ''),
-                                  ),
-                          ),
-                          Divider(
-                            color: grn.withOpacity(0.1),
-                            thickness: 2.0,
-                          ),
-                          AmountTag(
-                            title: "Sending fee",
-                            amount: notSupported == true
-                                ? "N/A"
-                                : _formatNumber(
-                                    sendingFeeOne
-                                        .toString()
-                                        .replaceAll(',', ''),
-                                  ),
-                          ),
-                          Divider(
-                            color: grn.withOpacity(0.1),
-                            thickness: 2.0,
-                          ),
-                          AmountTag(
-                            title: "Withdrawal charge",
-                            amount: notSupported == true
-                                ? "N/A"
-                                : _formatNumber(
-                                    agentWithdrawalFee
-                                        .toString()
-                                        .replaceAll(',', ''),
-                                  ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 30.0),
-                    TitleTab(
-                      title:
-                          "Sending to pochi la biashara and business till to customer",
-                      mptheme: mptheme,
-                    ),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
-                      decoration: BoxDecoration(
-                        color: grn.withOpacity(0.1),
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20.0),
-                          bottomRight: Radius.circular(20.0),
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          AmountTag(
-                              title: "Amount to send",
-                              amount: notSupported == true
-                                  ? "N/A"
-                                  : _formatNumber(amountToSendOne
-                                      .toString()
-                                      .replaceAll(',', ''))),
-                          Divider(
-                            color: grn.withOpacity(0.1),
-                            thickness: 2.0,
-                          ),
-                          AmountTag(
-                            title: "Account minimum balance",
-                            amount: notSupported == true
-                                ? "N/A"
-                                : _formatNumber(
-                                    minimumBalanceOne
-                                        .toString()
-                                        .replaceAll(',', ''),
-                                  ),
-                          ),
-                          Divider(
-                            color: grn.withOpacity(0.1),
-                            thickness: 2.0,
-                          ),
-                          AmountTag(
-                            title: "Sending fee",
-                            amount: notSupported == true
-                                ? "N/A"
-                                : _formatNumber(
-                                    sendingFeeOne
-                                        .toString()
-                                        .replaceAll(',', ''),
-                                  ),
-                          ),
-                          Divider(
-                            color: grn.withOpacity(0.1),
-                            thickness: 2.0,
-                          ),
-                          AmountTag(
-                            title: "Withdrawal charge",
-                            amount: notSupported == true
-                                ? "N/A"
-                                : _formatNumber(
-                                    agentWithdrawalFee
-                                        .toString()
-                                        .replaceAll(',', ''),
-                                  ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 30.0),
-                    TitleTab(
-                      title: "Sending to an unregistered number",
-                      mptheme: mptheme,
-                    ),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
-                      decoration: BoxDecoration(
-                        color: grn.withOpacity(0.1),
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20.0),
-                          bottomRight: Radius.circular(20.0),
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          AmountTag(
-                            title: "Account minimum balance",
-                            amount: notSupported == true
-                                ? "N/A"
-                                : _formatNumber(
-                                    amountToSendTwo
-                                        .toString()
-                                        .replaceAll(',', ''),
-                                  ),
-                          ),
-                          Divider(
-                            color: grn.withOpacity(0.1),
-                            thickness: 2.0,
-                          ),
-                          AmountTag(
-                            title: "Sending fee",
-                            amount: notSupported == true
-                                ? "N/A"
-                                : _formatNumber(
-                                    sendingFeeTwo
-                                        .toString()
-                                        .replaceAll(',', ''),
-                                  ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 30.0),
-                    TitleTab(
-                      title: "Withdraw at an agent",
-                      mptheme: mptheme,
-                    ),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
-                      decoration: BoxDecoration(
-                        color: grn.withOpacity(0.1),
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20.0),
-                          bottomRight: Radius.circular(20.0),
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          AmountTag(
-                            title: "Withdrawal charge",
-                            amount: notSupported == true
-                                ? "N/A"
-                                : _formatNumber(
-                                    agentWithdrawalFee
-                                        .toString()
-                                        .replaceAll(',', ''),
-                                  ),
-                          ),
-                          Divider(
-                            color: grn.withOpacity(0.1),
-                            thickness: 2.0,
-                          ),
-                          AmountTag(
-                            title: "Withdrawable amount",
-                            amount: notSupported == true
-                                ? "N/A"
-                                : _formatNumber(
-                                    withdrawableAmountAgent
-                                        .toString()
-                                        .replaceAll(',', ''),
-                                  ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 30.0),
-                    TitleTab(
-                      title: "Withdraw at an ATM",
-                      mptheme: mptheme,
-                    ),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
-                      decoration: BoxDecoration(
-                        color: grn.withOpacity(0.1),
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20.0),
-                          bottomRight: Radius.circular(20.0),
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          AmountTag(
-                            title: "Withdrawal charge",
-                            amount:
-                                notSupported == true || atmNotSupported == true
-                                    ? "N/A"
-                                    : _formatNumber(
-                                        atmWithdrawalFee
-                                            .toString()
-                                            .replaceAll(',', ''),
-                                      ),
-                          ),
-                          Divider(
-                            color: grn.withOpacity(0.1),
-                            thickness: 2.0,
-                          ),
-                          AmountTag(
-                            title: "Withdrawable amount",
-                            amount:
-                                notSupported == true || atmNotSupported == true
-                                    ? "N/A"
-                                    : _formatNumber(
-                                        withdrawableAmountAtm
-                                            .toString()
-                                            .replaceAll(',', ''),
-                                      ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 25.0),
-                    Text(
-                      "Powered by Wrenix Studio",
-                      style: TextStyle(color: grn, fontSize: 12.0),
-                    ),
-                    SizedBox(height: 5.0),
-                  ],
+                    feedbackModal(context);
+                  },
                 ),
               ),
             ],
+            centerTitle: true,
+            elevation: 0.0,
+            backgroundColor: Color(0xff52B44B),
+          ),
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  height: 130.0,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: grn,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 0.0),
+                      Text(
+                        "Amount you wish to send",
+                        style: TextStyle(
+                          color: mptheme == "light" ? white : darkBlack,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                      const SizedBox(height: 8.0),
+                      CupertinoTextField(
+                        cursorColor: mptheme == "light" ? white : darkBlack,
+                        autofocus: false,
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        placeholder: "ksh 0",
+                        cursorOpacityAnimates: true,
+                        placeholderStyle: TextStyle(
+                          color: mptheme == "light"
+                              ? white.withOpacity(0.3)
+                              : darkBlack.withOpacity(0.3),
+                        ),
+                        style: TextStyle(
+                          fontFamily: "SFT-Bold",
+                          fontSize: 35.0,
+                          color: mptheme == "light" ? white : darkBlack,
+                        ),
+                        controller: _amountController,
+                        decoration: const BoxDecoration(
+                          color: Colors.transparent,
+                        ),
+                        onChanged: (string) {
+                          setState(() {
+                            statusMessage = "";
+                          });
+
+                          if (string.isNotEmpty) {
+                            string = _formatNumber(string.replaceAll(',', ''));
+                            _amountController.value = TextEditingValue(
+                              text: string,
+                              selection: TextSelection.collapsed(
+                                  offset: string.length),
+                            );
+
+                            if (string.replaceAll(',', '') == "6969") {
+                              setState(() {
+                                statusMessage = "Nice!";
+                              });
+                            }
+
+                            if (string.replaceAll(',', '') == "999999") {
+                              setState(() {
+                                statusMessage = "You wish!";
+                              });
+                            }
+
+                            print(string);
+
+                            if (int.parse(_amountController.text
+                                    .replaceAll(',', '')) >
+                                35000) {
+                              setState(() {
+                                atmNotSupported = true;
+                              });
+                            } else {
+                              setState(() {
+                                atmNotSupported = false;
+                              });
+                            }
+
+                            if (int.parse(_amountController.text
+                                    .replaceAll(',', '')) >
+                                150000) {
+                              setState(() {
+                                notSupported = true;
+                              });
+                            } else {
+                              notSupported = false;
+                              calculateFees();
+                              calculateUnregisteredFees();
+                            }
+                          } else {
+                            setState(() {
+                              minimumBalanceOne = 0;
+                              sendingFeeOne = 0;
+                              sendingFeeTwo = 0;
+                              amountToSendOne = 0;
+                              amountToSendTwo = 0;
+                              agentWithdrawalFee = 0;
+                              atmWithdrawalFee = 0;
+                              withdrawableAmountAgent = 0;
+                              withdrawableAmountAtm = 0;
+                            });
+                          }
+                        },
+                      ),
+                      SizedBox(height: 10.0),
+                      statusMessage.isEmpty
+                          ? Container()
+                          : Container(
+                              padding: EdgeInsets.only(
+                                top: 4.0,
+                                bottom: 4.0,
+                                left: 20.0,
+                                right: 20.0,
+                              ),
+                              decoration: BoxDecoration(
+                                color: mptheme == "light"
+                                    ? white
+                                    : darkBlack.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(50.0),
+                              ),
+                              child: Text(
+                                statusMessage,
+                                style: TextStyle(
+                                  fontFamily: 'AR',
+                                  color: mptheme == "light" ? white : darkBlack,
+                                  fontSize: 12.0,
+                                ),
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      TitleTab(
+                        title: "Sending to a registered number",
+                        mptheme: mptheme,
+                      ),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 10.0),
+                        decoration: BoxDecoration(
+                          color: grn.withOpacity(0.1),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(20.0),
+                            bottomRight: Radius.circular(20.0),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            AmountTag(
+                                title: "Amount to send",
+                                amount: notSupported == true
+                                    ? "N/A"
+                                    : _formatNumber(amountToSendOne
+                                        .toString()
+                                        .replaceAll(',', ''))),
+                            Divider(
+                              color: grn.withOpacity(0.1),
+                              thickness: 2.0,
+                            ),
+                            AmountTag(
+                              title: "Account minimum balance",
+                              amount: notSupported == true
+                                  ? "N/A"
+                                  : _formatNumber(
+                                      minimumBalanceOne
+                                          .toString()
+                                          .replaceAll(',', ''),
+                                    ),
+                            ),
+                            Divider(
+                              color: grn.withOpacity(0.1),
+                              thickness: 2.0,
+                            ),
+                            AmountTag(
+                              title: "Sending fee",
+                              amount: notSupported == true
+                                  ? "N/A"
+                                  : _formatNumber(
+                                      sendingFeeOne
+                                          .toString()
+                                          .replaceAll(',', ''),
+                                    ),
+                            ),
+                            Divider(
+                              color: grn.withOpacity(0.1),
+                              thickness: 2.0,
+                            ),
+                            AmountTag(
+                              title: "Withdrawal charge",
+                              amount: notSupported == true
+                                  ? "N/A"
+                                  : _formatNumber(
+                                      agentWithdrawalFee
+                                          .toString()
+                                          .replaceAll(',', ''),
+                                    ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 30.0),
+                      TitleTab(
+                        title:
+                            "Sending to pochi la biashara and business till to customer",
+                        mptheme: mptheme,
+                      ),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 10.0),
+                        decoration: BoxDecoration(
+                          color: grn.withOpacity(0.1),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(20.0),
+                            bottomRight: Radius.circular(20.0),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            AmountTag(
+                                title: "Amount to send",
+                                amount: notSupported == true
+                                    ? "N/A"
+                                    : _formatNumber(amountToSendOne
+                                        .toString()
+                                        .replaceAll(',', ''))),
+                            Divider(
+                              color: grn.withOpacity(0.1),
+                              thickness: 2.0,
+                            ),
+                            AmountTag(
+                              title: "Account minimum balance",
+                              amount: notSupported == true
+                                  ? "N/A"
+                                  : _formatNumber(
+                                      minimumBalanceOne
+                                          .toString()
+                                          .replaceAll(',', ''),
+                                    ),
+                            ),
+                            Divider(
+                              color: grn.withOpacity(0.1),
+                              thickness: 2.0,
+                            ),
+                            AmountTag(
+                              title: "Sending fee",
+                              amount: notSupported == true
+                                  ? "N/A"
+                                  : _formatNumber(
+                                      sendingFeeOne
+                                          .toString()
+                                          .replaceAll(',', ''),
+                                    ),
+                            ),
+                            Divider(
+                              color: grn.withOpacity(0.1),
+                              thickness: 2.0,
+                            ),
+                            AmountTag(
+                              title: "Withdrawal charge",
+                              amount: notSupported == true
+                                  ? "N/A"
+                                  : _formatNumber(
+                                      agentWithdrawalFee
+                                          .toString()
+                                          .replaceAll(',', ''),
+                                    ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 30.0),
+                      TitleTab(
+                        title: "Sending to an unregistered number",
+                        mptheme: mptheme,
+                      ),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 10.0),
+                        decoration: BoxDecoration(
+                          color: grn.withOpacity(0.1),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(20.0),
+                            bottomRight: Radius.circular(20.0),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            AmountTag(
+                              title: "Account minimum balance",
+                              amount: notSupported == true
+                                  ? "N/A"
+                                  : _formatNumber(
+                                      amountToSendTwo
+                                          .toString()
+                                          .replaceAll(',', ''),
+                                    ),
+                            ),
+                            Divider(
+                              color: grn.withOpacity(0.1),
+                              thickness: 2.0,
+                            ),
+                            AmountTag(
+                              title: "Sending fee",
+                              amount: notSupported == true
+                                  ? "N/A"
+                                  : _formatNumber(
+                                      sendingFeeTwo
+                                          .toString()
+                                          .replaceAll(',', ''),
+                                    ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 30.0),
+                      TitleTab(
+                        title: "Withdraw at an agent",
+                        mptheme: mptheme,
+                      ),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 10.0),
+                        decoration: BoxDecoration(
+                          color: grn.withOpacity(0.1),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(20.0),
+                            bottomRight: Radius.circular(20.0),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            AmountTag(
+                              title: "Withdrawal charge",
+                              amount: notSupported == true
+                                  ? "N/A"
+                                  : _formatNumber(
+                                      agentWithdrawalFee
+                                          .toString()
+                                          .replaceAll(',', ''),
+                                    ),
+                            ),
+                            Divider(
+                              color: grn.withOpacity(0.1),
+                              thickness: 2.0,
+                            ),
+                            AmountTag(
+                              title: "Withdrawable amount",
+                              amount: notSupported == true
+                                  ? "N/A"
+                                  : _formatNumber(
+                                      withdrawableAmountAgent
+                                          .toString()
+                                          .replaceAll(',', ''),
+                                    ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 30.0),
+                      TitleTab(
+                        title: "Withdraw at an ATM",
+                        mptheme: mptheme,
+                      ),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 10.0),
+                        decoration: BoxDecoration(
+                          color: grn.withOpacity(0.1),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(20.0),
+                            bottomRight: Radius.circular(20.0),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            AmountTag(
+                              title: "Withdrawal charge",
+                              amount: notSupported == true ||
+                                      atmNotSupported == true
+                                  ? "N/A"
+                                  : _formatNumber(
+                                      atmWithdrawalFee
+                                          .toString()
+                                          .replaceAll(',', ''),
+                                    ),
+                            ),
+                            Divider(
+                              color: grn.withOpacity(0.1),
+                              thickness: 2.0,
+                            ),
+                            AmountTag(
+                              title: "Withdrawable amount",
+                              amount: notSupported == true ||
+                                      atmNotSupported == true
+                                  ? "N/A"
+                                  : _formatNumber(
+                                      withdrawableAmountAtm
+                                          .toString()
+                                          .replaceAll(',', ''),
+                                    ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 25.0),
+                      Text(
+                        "Powered by Wrenix Studio",
+                        style: TextStyle(color: grn, fontSize: 12.0),
+                      ),
+                      SizedBox(height: 5.0),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

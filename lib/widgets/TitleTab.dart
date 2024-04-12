@@ -22,8 +22,8 @@ class TitleTab extends StatelessWidget {
       decoration: BoxDecoration(
           color: Color(0xff52B44B),
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20.0),
-            topRight: Radius.circular(20.0),
+            topLeft: Radius.circular(10.0),
+            topRight: Radius.circular(10.0),
           )),
       child: Text(
         title,

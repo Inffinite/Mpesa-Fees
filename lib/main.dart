@@ -6,11 +6,6 @@ import 'package:mpesafees/screens/SplashScreen.dart';
 
 void main() async {
   await dotenv.load(fileName: '.env');
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Color(0xff52B44B),
-    ),
-  );
   runApp(const MyApp());
 }
 
