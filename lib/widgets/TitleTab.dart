@@ -4,7 +4,7 @@ class TitleTab extends StatelessWidget {
   final String title;
   final String mptheme;
 
-  const TitleTab({
+  const TitleTab({super.key, 
     required this.title,
     required this.mptheme,
   });
@@ -19,7 +19,7 @@ class TitleTab extends StatelessWidget {
         left: 20.0,
         right: 20.0,
       ),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
           color: Color(0xff52B44B),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(10.0),
@@ -30,7 +30,7 @@ class TitleTab extends StatelessWidget {
         style: TextStyle(
           fontFamily: "AR",
           fontSize: 14.0,
-          color: mptheme == "light" ? Colors.white : Color(0xff000000),
+          color: mptheme == "light" ? Colors.white : const Color(0xff000000),
         ),
       ),
     );

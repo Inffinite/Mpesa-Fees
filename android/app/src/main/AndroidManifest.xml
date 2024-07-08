@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.wrenix.mpesafees">
+    <uses-sdk android:targetSdkVersion="34" />
     <uses-permission android:name="android.permission.INTERNET"/>
     
    <application

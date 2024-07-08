@@ -4,8 +4,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-  static final _databaseName = 'mpesafees.db';
-  static final _databaseVersion = 1;
+  static const _databaseName = 'mpesafees.db';
+  static const _databaseVersion = 1;
 
   // make this a singleton class
   DatabaseHelper._privateConstructor();

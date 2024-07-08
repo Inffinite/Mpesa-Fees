@@ -7,7 +7,7 @@ class AmountTag extends StatefulWidget {
   final String title;
   String amount;
 
-  AmountTag({
+  AmountTag({super.key, 
     required this.title,
     required this.amount,
   });
@@ -27,10 +27,10 @@ class _AmountTagState extends State<AmountTag> {
       SnackBar(
         content: Text(
           message,
-          style: TextStyle(fontFamily: "SFNSR"),
+          style: const TextStyle(fontFamily: "SFNSR"),
         ),
-        duration: Duration(seconds: 2),
-        backgroundColor: Color(0xff52B44B),
+        duration: const Duration(seconds: 2),
+        backgroundColor: const Color(0xff52B44B),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
@@ -51,11 +51,11 @@ class _AmountTagState extends State<AmountTag> {
           });
 
           var timer = Timer(
-              Duration(seconds: 1),
-              () => {
+              const Duration(seconds: 1),
+              () {
                     setState(() {
                       widget.amount = value;
-                    })
+                    });
                   });
         }
         // showToast(context, "Copied to clipboard");
@@ -87,7 +87,7 @@ class _AmountTagState extends State<AmountTag> {
               style: TextStyle(
                 fontFamily: "SFT-Bold",
                 fontSize: widget.amount == "Copied to clipboard" ? 16.0 : 26.0,
-                color: Color(0xff52B44B),
+                color: const Color(0xff52B44B),
               ),
             ),
           ],

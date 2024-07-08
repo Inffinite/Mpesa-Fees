@@ -1,8 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 
 import 'Dashboard.dart';
 
@@ -16,14 +14,14 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   moveOn() async {
     var timer = Timer(
-        Duration(seconds: 3),
-        () => {
+        const Duration(seconds: 3),
+        () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const Dashboard(),
                 ),
-              )
+              );
             });
   }
 
@@ -37,10 +35,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xff52B44B),
+      backgroundColor: const Color(0xff52B44B),
       body: Stack(
         children: [
-          Container(
+          SizedBox(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             child: Center(
@@ -51,15 +49,15 @@ class _SplashScreenState extends State<SplashScreen> {
                   borderRadius: BorderRadius.circular(20.0),
                   color: Colors.white,
                 ),
-                child: Center(child: Text("Mpesa Fees")),
+                child: const Center(child: Text("Mpesa Fees")),
               ),
             ),
           ),
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              margin: EdgeInsets.only(bottom: 30.0),
-              child: Text(
+              margin: const EdgeInsets.only(bottom: 30.0),
+              child: const Text(
                 "Powered by Wrenix Studio",
                 style: TextStyle(
                     color: Colors.white, fontFamily: "AR", fontSize: 14.0),

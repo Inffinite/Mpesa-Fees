@@ -29,7 +29,7 @@ class _DashboardState extends State<Dashboard> {
   final InAppReview _inAppReview = InAppReview.instance;
   final _dbHelper = DatabaseHelper.instance;
 
-  String _appStoreId = 'com.wrenix.mpesafees';
+  final String _appStoreId = 'com.wrenix.mpesafees';
   Availability _availability = Availability.loading;
 
   final TextEditingController _amountController = TextEditingController();
@@ -64,10 +64,10 @@ class _DashboardState extends State<Dashboard> {
 
   var mptheme = "light";
 
-  Color grn = Color(0xff52B44B);
+  Color grn = const Color(0xff52B44B);
   Color white = Colors.white;
 
-  Color darkBlack = Color(0xff000000);
+  Color darkBlack = const Color(0xff000000);
 
   var sendBtnText = "Send";
 
@@ -254,7 +254,7 @@ class _DashboardState extends State<Dashboard> {
           size: 25.0,
         );
       case "notloading":
-        return Text(
+        return const Text(
           'Send',
           style: TextStyle(
             fontSize: 16.0,
@@ -268,7 +268,7 @@ class _DashboardState extends State<Dashboard> {
   feedbackModal(context) {
     showModalBottomSheet(
       showDragHandle: true,
-      backgroundColor: Color(0xff52B44B),
+      backgroundColor: const Color(0xff52B44B),
       isScrollControlled: true,
       context: context,
       builder: (BuildContext context) {
@@ -304,9 +304,9 @@ class _DashboardState extends State<Dashboard> {
                         ),
                         const SizedBox(height: 20.0),
                         CupertinoTextField(
-                          padding: EdgeInsets.all(20.0),
+                          padding: const EdgeInsets.all(20.0),
                           decoration: BoxDecoration(
-                              color: Color.fromARGB(255, 71, 160, 65),
+                              color: const Color.fromARGB(255, 71, 160, 65),
                               borderRadius: BorderRadius.circular(20.0)),
                           scrollPhysics: const BouncingScrollPhysics(),
                           style: const TextStyle(
@@ -319,6 +319,7 @@ class _DashboardState extends State<Dashboard> {
                           maxLines: 5,
                           placeholder: "Whats on your mind...",
                           obscureText: false,
+                          minLines: 1,
                           placeholderStyle: TextStyle(
                             color: Colors.white.withOpacity(0.5),
                             fontFamily: "SFNSR",
@@ -343,7 +344,7 @@ class _DashboardState extends State<Dashboard> {
                             color: Colors.white,
                             child: Text(
                               sendBtnText,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 16.0,
                                 color: Color(0xff52B44B),
                                 fontFamily: "AR",
@@ -355,7 +356,7 @@ class _DashboardState extends State<Dashboard> {
                                   sendBtnText = "Sending...";
                                 });
                                 var mymessage = messagecontroller.text;
-                                if (mymessage.length == 0) {
+                                if (mymessage.isEmpty) {
                                   print("DO NOTHING");
                                 } else {
                                   sendHome(messagecontroller.text);
@@ -438,14 +439,14 @@ class _DashboardState extends State<Dashboard> {
         value: SystemUiOverlayStyle(
           systemNavigationBarContrastEnforced: false,
           systemNavigationBarColor: mptheme == "light" ? white : darkBlack,
-          statusBarColor: Color(0xff52B44B),
+          statusBarColor: const Color(0xff52B44B),
           statusBarBrightness: Brightness.dark,
         ),
         child: Scaffold(
           backgroundColor: mptheme == "light" ? white : darkBlack,
           floatingActionButton: checkKeyboard()
               ? FloatingActionButton(
-                  backgroundColor: Color(0xff52B44B),
+                  backgroundColor: const Color(0xff52B44B),
                   onPressed: () {
                     _amountController.clear();
                   },
@@ -458,12 +459,12 @@ class _DashboardState extends State<Dashboard> {
           appBar: AppBar(
             systemOverlayStyle: SystemUiOverlayStyle(
               statusBarColor:
-                  Color(0xff52B44B), // Set your desired status bar color
+                  const Color(0xff52B44B), // Set your desired status bar color
               statusBarIconBrightness: mptheme == 'light'
                   ? Brightness.light
                   : Brightness.dark, // Optional: Set icon brightness
             ),
-            surfaceTintColor: Color(0xff52B44B),
+            surfaceTintColor: const Color(0xff52B44B),
             title: Text(
               "Mpesa Fees",
               style: TextStyle(
@@ -473,7 +474,7 @@ class _DashboardState extends State<Dashboard> {
               ),
             ),
             leading: Container(
-              margin: EdgeInsets.only(
+              margin: const EdgeInsets.only(
                 left: 15.0,
               ),
               child: IconButton(
@@ -519,7 +520,7 @@ class _DashboardState extends State<Dashboard> {
             ),
             actions: [
               Container(
-                margin: EdgeInsets.only(
+                margin: const EdgeInsets.only(
                   right: 15.0,
                 ),
                 child: IconButton(
@@ -542,7 +543,7 @@ class _DashboardState extends State<Dashboard> {
             ],
             centerTitle: true,
             elevation: 0.0,
-            backgroundColor: Color(0xff52B44B),
+            backgroundColor: const Color(0xff52B44B),
           ),
           body: SingleChildScrollView(
             child: Column(
@@ -652,11 +653,11 @@ class _DashboardState extends State<Dashboard> {
                           }
                         },
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       statusMessage.isEmpty
                           ? Container()
                           : Container(
-                              padding: EdgeInsets.only(
+                              padding: const EdgeInsets.only(
                                 top: 4.0,
                                 bottom: 4.0,
                                 left: 20.0,
@@ -693,7 +694,7 @@ class _DashboardState extends State<Dashboard> {
                         padding: const EdgeInsets.symmetric(vertical: 10.0),
                         decoration: BoxDecoration(
                           color: grn.withOpacity(0.1),
-                          borderRadius: BorderRadius.only(
+                          borderRadius: const BorderRadius.only(
                             bottomLeft: Radius.circular(20.0),
                             bottomRight: Radius.circular(20.0),
                           ),
@@ -763,7 +764,7 @@ class _DashboardState extends State<Dashboard> {
                         padding: const EdgeInsets.symmetric(vertical: 10.0),
                         decoration: BoxDecoration(
                           color: grn.withOpacity(0.1),
-                          borderRadius: BorderRadius.only(
+                          borderRadius: const BorderRadius.only(
                             bottomLeft: Radius.circular(20.0),
                             bottomRight: Radius.circular(20.0),
                           ),
@@ -832,7 +833,7 @@ class _DashboardState extends State<Dashboard> {
                         padding: const EdgeInsets.symmetric(vertical: 10.0),
                         decoration: BoxDecoration(
                           color: grn.withOpacity(0.1),
-                          borderRadius: BorderRadius.only(
+                          borderRadius: const BorderRadius.only(
                             bottomLeft: Radius.circular(20.0),
                             bottomRight: Radius.circular(20.0),
                           ),
@@ -876,7 +877,7 @@ class _DashboardState extends State<Dashboard> {
                         padding: const EdgeInsets.symmetric(vertical: 10.0),
                         decoration: BoxDecoration(
                           color: grn.withOpacity(0.1),
-                          borderRadius: BorderRadius.only(
+                          borderRadius: const BorderRadius.only(
                             bottomLeft: Radius.circular(20.0),
                             bottomRight: Radius.circular(20.0),
                           ),
@@ -920,7 +921,7 @@ class _DashboardState extends State<Dashboard> {
                         padding: const EdgeInsets.symmetric(vertical: 10.0),
                         decoration: BoxDecoration(
                           color: grn.withOpacity(0.1),
-                          borderRadius: BorderRadius.only(
+                          borderRadius: const BorderRadius.only(
                             bottomLeft: Radius.circular(20.0),
                             bottomRight: Radius.circular(20.0),
                           ),
@@ -956,12 +957,12 @@ class _DashboardState extends State<Dashboard> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 25.0),
+                      const SizedBox(height: 25.0),
                       Text(
                         "Powered by Wrenix Studio",
                         style: TextStyle(color: grn, fontSize: 12.0),
                       ),
-                      SizedBox(height: 5.0),
+                      const SizedBox(height: 5.0),
                     ],
                   ),
                 ),
